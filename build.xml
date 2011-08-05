@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="mydb">
+	<property name="project.dir" value="." />
+
+	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="lib" /> 
+	
+	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="dist" />
+	
+	<property name="jar-file-name" value="${ant.project.name}.jar"/>
+	<property name="main-class" value="com.mooo.wm.WatchControl"/> <!-- main-class 入口类-->
+
+    <property environment="env"/><!-- 访问环境变量 -->
+	<property name="ant.home" value="${env.ANT_HOME}"/>
+	
+	<!-- 初始化 classpath -->
+	<path id="project.classpath">
+		<fileset dir="${project.dir}/${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+
+		<pathelement location="${build.dir}/classes" />
+		<pathelement path="${java.class.path}" />
+	</path>
+	
+	<!-- 删除之前的目录结构 -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- 创建化目录结构 -->
+	<target name="init">
+		<mkdir dir="${build.dir}/classes" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+	
+	<!-- 编译Java代码 -->
+	<target name="compile" depends="init" description="compile java source">
+		
+		<javac srcdir="${src.dir}" destdir="${build.dir}/classes" encoding="utf-8" includeantruntime="on">
+			<classpath refid="project.classpath" />
+		</javac>
+
+		<copy todir="${build.dir}/classes">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml" />
+				<include name="**/*.dtd" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- 默认设置编译代码  -->
+    <target name="build" depends="compile">
+		<echo message="${ant.home}"/>
+    </target>
+	
+	<!-- 文档编译  -->
+	<target name="doc" depends="compile" description="Create Javadoc API documentation">
+		<mkdir dir="${dist.dir}/docs/api" />
+		<javadoc sourcepath="${src.dir}" charset="utf-8"  encoding="utf-8" destdir="${dist.dir}/docs/api">
+			<classpath refid="compile.classpath" />
+		</javadoc>
+		<echo>javadoc is complete!</echo>
+	</target>
+	
+	<!-- 打包JAR  -->
+	<!-- 解压第3方包  -->
+	<target name="unziplib">
+		<unjar dest="${build.dir}/classes">
+	    	<fileset dir="${lib.dir}" includes="*.jar"/>
+	    </unjar>
+	</target>
+	
+	<!-- 把所有目标文件打包  -->
+	<!--  <target name="jar" depends="unziplib,compile"> -->
+
+	<target name="jar" depends="compile">
+		<echo message="${ant.project.name}: ${ant.file}"/>
+		
+		<jar basedir="${build.dir}/classes" destfile="${dist.dir}/${jar-file-name}">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}"/>
+				<attribute name="Class-Path" value=""/>
+			</manifest>
+			
+			<fileset dir="${build.dir}/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<!-- 运行发布包 -->
+	<target name="run" depends="jar">    
+		<java jar="${dist.dir}/${jar-file-name}" fork="true" maxmemory="256m">
+			<jvmarg value="-XX:+HeapDumpOnOutOfMemoryError" /> 
+		</java>
+	</target>
+</project>

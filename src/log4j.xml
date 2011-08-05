@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<!--The program overrides these inputs and sets ExpressoLog to do the following:
+		class="org.apache.log4j.FileAppender
+		log location: specified in the default.properties file
+		
+		You CAN specify the layout here 
+	-->
+    <appender name="watchLog" class="org.apache.log4j.RollingFileAppender">
+            <param name="MaxFileSize" value="2000KB"/>
+            <param name="File" value="watchLog.log"/>
+            <param name="Append" value="true"/>
+            <layout class="org.apache.log4j.PatternLayout">
+                    <param name="ConversionPattern" value="%d %-5p [%t] %C{2} (%l) - %m\n"/>
+            </layout>
+    </appender>
+    
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.Out"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p [%t] %C{2} (%F:%L) - %m\n"/>
+		</layout>
+	</appender>
+
+    <!-- The root for struts -->
+    <category name="com.mooo.wm" additivity="false">
+        <priority value="debug"/>
+        <appender-ref ref="watchLog"/>
+    </category>
+
+	<!-- the one and only root category -->
+	<root>
+		<priority value="warn"/>
+		<appender-ref ref="console"/>
+	</root>
+</log4j:configuration>
