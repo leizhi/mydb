@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- WARNING: Eclipse auto-generated file.
-              Any modifications will be overwritten.
-              To include a user specific buildfile here, simply create one in the same
-              directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. -->
+			Any modifications will be overwritten.
+			To include a user specific buildfile here, simply create one in the same
+			directory with the processing instruction <?eclipse.ant.import?>
+			as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="mydb">
 	<property name="project.dir" value="." />
 
@@ -14,9 +14,8 @@
 	<property name="dist.dir" value="dist" />
 	
 	<property name="jar-file-name" value="${ant.project.name}.jar"/>
-	<property name="main-class" value="com.mooo.wm.WatchControl"/> <!-- main-class 入口类-->
 
-    <property environment="env"/><!-- 访问环境变量 -->
+	<property environment="env"/><!-- 访问环境变量 -->
 	<property name="ant.home" value="${env.ANT_HOME}"/>
 	
 	<!-- 初始化 classpath -->
@@ -58,30 +57,20 @@
 	</target>
 	
 	<!-- 默认设置编译代码  -->
-    <target name="build" depends="compile">
+	<target name="build" depends="compile">
 		<echo message="${ant.home}"/>
-    </target>
+	</target>
 	
 	<!-- 文档编译  -->
 	<target name="doc" depends="compile" description="Create Javadoc API documentation">
 		<mkdir dir="${dist.dir}/docs/api" />
-		<javadoc sourcepath="${src.dir}" charset="utf-8"  encoding="utf-8" destdir="${dist.dir}/docs/api">
+		<javadoc charset="utf-8"  encoding="utf-8" sourcepath="${src.dir}" destdir="${dist.dir}/docs/api" packagenames="com.mooo.db.*">
 			<classpath refid="compile.classpath" />
 		</javadoc>
+
 		<echo>javadoc is complete!</echo>
 	</target>
 	
-	<!-- 打包JAR  -->
-	<!-- 解压第3方包  -->
-	<target name="unziplib">
-		<unjar dest="${build.dir}/classes">
-	    	<fileset dir="${lib.dir}" includes="*.jar"/>
-	    </unjar>
-	</target>
-	
-	<!-- 把所有目标文件打包  -->
-	<!--  <target name="jar" depends="unziplib,compile"> -->
-
 	<target name="jar" depends="compile">
 		<echo message="${ant.project.name}: ${ant.file}"/>
 		
@@ -95,12 +84,5 @@
 				<include name="**/*.class"/>
 			</fileset>
 		</jar>
-	</target>
-	
-	<!-- 运行发布包 -->
-	<target name="run" depends="jar">    
-		<java jar="${dist.dir}/${jar-file-name}" fork="true" maxmemory="256m">
-			<jvmarg value="-XX:+HeapDumpOnOutOfMemoryError" /> 
-		</java>
 	</target>
 </project>

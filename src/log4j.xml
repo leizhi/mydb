@@ -24,9 +24,9 @@
 	</appender>
 
     <!-- The root for struts -->
-    <category name="com.mooo.wm" additivity="false">
+    <category name="com.mooo.db" additivity="false">
         <priority value="debug"/>
-        <appender-ref ref="watchLog"/>
+        <appender-ref ref="dbLog"/>
     </category>
 
 	<!-- the one and only root category -->
