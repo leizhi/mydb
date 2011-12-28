@@ -17,6 +17,8 @@ import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 public class DbBridgingBean {
 	//private static Log log = LogFactory.getLog(BeanUtil.class);
+	private String prefix;
+	private boolean enableCase;
 
 	/**
 	 * 动态赋值给系统对象 String Integer Long Float Date 等
@@ -165,6 +167,14 @@ public class DbBridgingBean {
 	}
 	
 	public void dbToBean(String catalog, String table){
+		prefix = DbConfig.getProperty("Db.humpInterval");
+
+		if(prefix !=null && prefix.equals("case")){
+			prefix = null;
+		}
+
+		enableCase = DbConfig.getProperty("Db.case").equals("true");
+
 		Connection con = null;
 		Statement stmt = null;
 		ResultSetMetaData rsmd = null;
@@ -184,12 +194,12 @@ public class DbBridgingBean {
 		System.out.println(con);
 		
 		DatabaseMetaData db =  DbConnectionManager.getConnection().getMetaData();
-		rs = db.getPrimaryKeys(catalog, null, StringUtils.upperToPrefix(table, null));
+		rs = db.getPrimaryKeys(catalog, null, StringUtils.prefixToUpperNot(table, null));
 		rsmd = rs.getMetaData();
 		
 		while (rs.next()) {
 			for (int i = 1; i < rsmd.getColumnCount()+1; i++) {
-				System.out.print(rs.getString(i) + " ");
+				System.out.print(StringUtils.prefixToUpperNot(rs.getString(i),prefix) + " ");
 			}
 			System.out.println();
 		}
@@ -207,7 +217,7 @@ public class DbBridgingBean {
 		rs = db.getColumns(catalog, null, table, null);
 		while (rs.next()) {
 		for (int i = 1; i < 19; i++) {
-		System.out.print(rs.getString(i) + " ");
+		System.out.print(StringUtils.prefixToUpperNot(rs.getString(i),prefix) + " ");
 		}
 		System.out.println("+++++++++++++++++++++++++++++++++");
 
@@ -224,12 +234,12 @@ public class DbBridgingBean {
 		
 		sql = "SELECT  * FROM "+table;
 		System.out.println(sql);
-		buffer.append(StringUtils.prefixToUpper(table));
+		buffer.append(StringUtils.prefixToUpperNot(table,prefix));
 		//buffer.append(" extends DBObject {\n");
 		buffer.append(" {\n");
 		buffer.append("\tprivate static final long serialVersionUID = 1L;\n");
 
-		System.out.println("beanName="+StringUtils.upperToPrefix(table,null));
+		System.out.println("beanName="+StringUtils.prefixToUpperNot(table,prefix));
 
 		stmt = con.createStatement();
 		rs = stmt.executeQuery(sql);
@@ -247,11 +257,8 @@ public class DbBridgingBean {
 			precision = rsmd.getPrecision(i+1);
 			scale = rsmd.getScale(i+1);
 			columnName = rsmd.getColumnName(i + 1);
-			
-			System.out.println(columnName+" Precision: "+ precision+" Scale: "+scale);
+			columnName = StringUtils.prefixToUpperNot(columnName,prefix);
 
-			columnName = StringUtils.prefixToUpperNot(columnName,null);
-			
 			System.out.println(columnName+" Precision: "+ precision+" Scale: "+scale);
 
 			if(type == Types.VARCHAR || type == Types.LONGVARCHAR || type == Types.CHAR || type ==Types.LONGNVARCHAR){

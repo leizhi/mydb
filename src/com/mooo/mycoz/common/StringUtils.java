@@ -695,10 +695,10 @@ public class StringUtils {
 		String tmp="";
 		StringTokenizer tokens = new StringTokenizer(str, prefix);
 		while (tokens.hasMoreTokens()) {
-				tmp = tokens.nextToken();
-				result += tmp.substring(0, 1).toUpperCase()+tmp.substring(1);
+			tmp = tokens.nextToken();
+			result += tmp.substring(0, 1).toUpperCase()+tmp.substring(1);
 		}
-		
+
 		return result;
 
 	}
