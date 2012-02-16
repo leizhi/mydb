@@ -82,7 +82,7 @@ public class DbOracle extends OracleSQL implements DbProcess{
 		} finally {
 
 			try {
-					stmt.close();
+				stmt.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

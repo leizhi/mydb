@@ -64,11 +64,11 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 					
 					if(type == Types.TIMESTAMP){
 						DbBridgingBean.bindProperty(bean,
-								StringUtils.prefixToUpper(rsmd.getColumnName(i),null),
+								StringUtils.formatHump(rsmd.getColumnName(i),null),
 								result.getTimestamp(i));
 					}else {
 						DbBridgingBean.bindProperty(bean,
-								StringUtils.prefixToUpper(rsmd.getColumnName(i),null),
+								StringUtils.formatHump(rsmd.getColumnName(i),null),
 								result.getString(i));	
 					}
 

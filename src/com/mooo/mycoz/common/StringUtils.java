@@ -684,23 +684,23 @@ public class StringUtils {
 	public synchronized static final String prefixToUpper(String str,String prefix){
 		
 		if(prefix == null)
-			return str;
+			return str.toLowerCase();
 		
 		if (str != null && str.indexOf(prefix) < 0){
-			return str;
+			return str.toLowerCase();
 		}
 		
 		//spit prefix
-		String result=str;
+		String result="";
 		String tmp="";
 		StringTokenizer tokens = new StringTokenizer(str, prefix);
 		while (tokens.hasMoreTokens()) {
 			tmp = tokens.nextToken();
+			tmp = tmp.toLowerCase();
 			result += tmp.substring(0, 1).toUpperCase()+tmp.substring(1);
 		}
 
 		return result;
-
 	}
 	
 	//default not spilt
