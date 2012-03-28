@@ -106,10 +106,27 @@
 
 package com.mooo.mycoz.db.pool;
 
-import java.sql.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.CallableStatement;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.NClob;
+import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.SQLXML;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.sql.Struct;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -187,11 +204,9 @@ public class DbConnectionDefaultPool extends DbConnectionProvider {
 				e.printStackTrace();
 				return;
 			}
-			String logPath = props.getProperty("logPath");
-
 			try {
 				connectionPool = new ConnectionPool(driver, server, username,
-						password, minConnections, maxConnections, logPath,
+						password, minConnections, maxConnections,
 						connectionTimeout);
 			} catch (IOException ioe) {
 				System.err.println("Error starting DbConnectionDefaultPool: "
@@ -426,7 +441,7 @@ public class DbConnectionDefaultPool extends DbConnectionProvider {
 		 */
 		public ConnectionPool(String dbDriver, String dbServer, String dbLogin,
 				String dbPassword, int minConns, int maxConns,
-				String logFileString, double maxConnTime) throws IOException {
+				double maxConnTime) throws IOException {
 			connPool = new Connection[maxConns];
 			connStatus = new int[maxConns];
 			connLockTime = new long[maxConns];

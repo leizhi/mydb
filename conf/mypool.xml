@@ -8,6 +8,13 @@
 <entry key="serverPort">10000</entry>
 
 <!-- configure mysql database -->
+<entry key="DbConnectionDefaultPool.driver">org.gjt.mm.mysql.Driver</entry>
+<entry key="DbConnectionDefaultPool.server">jdbc:mysql://122.225.88.86/wineBranch?useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;transformedBitIsBoolean=true</entry>
+<entry key="DbConnectionDefaultPool.username">mycoz</entry>
+<entry key="DbConnectionDefaultPool.password">xmlpj0#</entry>
+<entry key="DbFactory.className">com.mooo.mycoz.db.DbMysql</entry>
+
+<!-- configure mysql database -->
 <!--
 <entry key="DbConnectionDefaultPool.driver">org.gjt.mm.mysql.Driver</entry>
 <entry key="DbConnectionDefaultPool.server">jdbc:mysql://127.0.0.1/mycozBranch?useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;transformedBitIsBoolean=true</entry>
@@ -25,12 +32,13 @@
 -->
 
 <!-- configure oracle database  -->
+<!--  
 <entry key="DbConnectionDefaultPool.driver">oracle.jdbc.driver.OracleDriver</entry>
 <entry key="DbConnectionDefaultPool.server">jdbc:oracle:thin:@10.16.2.37:1521:sbgldb</entry>
 <entry key="DbConnectionDefaultPool.username">D7IT</entry>
 <entry key="DbConnectionDefaultPool.password">D7IT</entry>
 <entry key="DbFactory.className">com.mooo.mycoz.db.DbOracle</entry>
-
+-->
 <!-- configure oracle database  -->
 <!--  
 <entry key="DbConnectionDefaultPool.driver">oracle.jdbc.driver.OracleDriver</entry>
