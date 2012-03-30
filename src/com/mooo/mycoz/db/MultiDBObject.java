@@ -166,10 +166,12 @@ public class MultiDBObject extends DbMultiBulildSQL implements MultiSQLProcess{
 					if(allRow.containsKey(StringUtils.toLowerFirst(table))){
 						Object bean = allRow.get(StringUtils.toLowerFirst(table));
 						
+						boolean enableCase = new Boolean(DbConfig.getProperty("Db.case"));
+						
 						if(type == Types.TIMESTAMP){
-							DbBridgingBean.bindProperty(bean,StringUtils.prefixToUpper(rsmd.getColumnName(i),null),result.getTimestamp(i));
+							DbBridgingBean.bindProperty(bean,StringUtils.prefixToUpper(rsmd.getColumnName(i),null,enableCase),result.getTimestamp(i));
 						}else {
-							DbBridgingBean.bindProperty(bean,StringUtils.prefixToUpper(rsmd.getColumnName(i),null),result.getString(i));	
+							DbBridgingBean.bindProperty(bean,StringUtils.prefixToUpper(rsmd.getColumnName(i),null,enableCase),result.getString(i));	
 						}					
 					}
 				}

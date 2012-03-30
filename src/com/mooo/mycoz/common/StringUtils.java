@@ -660,7 +660,7 @@ public class StringUtils {
 	}
 	
 	public synchronized static final String prefixToUpper(String str){
-		return prefixToUpper(str,"_");
+		return prefixToUpper(str,"_",false);
 	}
 
 	public synchronized static final String prefixToUpperNot(String str){
@@ -671,7 +671,7 @@ public class StringUtils {
 		String result = null;
 		
 		if (str != null && str.length() > 1 && prefix!=null && !prefix.equals("")) {
-			result = prefixToUpper(str, prefix);
+			result = prefixToUpper(str, prefix,false);
 			result = result.substring(0, 1).toLowerCase() + result.substring(1);
 		} else{
 			result=str;
@@ -681,11 +681,14 @@ public class StringUtils {
 	}
 	
 	//database field change bean field
-	public synchronized static final String prefixToUpper(String str,String prefix){
+	public synchronized static final String prefixToUpper(String str,String prefix,boolean enableCase){
 		
 		if(prefix == null)
-			return str.toLowerCase();
-		
+			if(enableCase)
+				return str;
+			else
+				return str.toLowerCase();
+
 		if (str != null && str.indexOf(prefix) < 0){
 			return str.toLowerCase();
 		}

@@ -18,7 +18,6 @@ import com.mooo.mycoz.db.pool.DbConnectionManager;
 public class DbBridgingBean {
 	//private static Log log = LogFactory.getLog(BeanUtil.class);
 	private String prefix;
-	private boolean enableCase;
 
 	/**
 	 * 动态赋值给系统对象 String Integer Long Float Date 等
@@ -71,6 +70,44 @@ public class DbBridgingBean {
 		}
 	}
 
+	public static void bindProperty(Object bean, String propertyName,
+			Long value) throws NoSuchMethodException,
+			InvocationTargetException, IllegalAccessException, ParseException,
+			InstantiationException {
+
+		// 得到方法名
+		String funName = StringUtils.getFunName(propertyName);
+		// get方法
+		Method getMethod = bean.getClass().getMethod("get" + funName);
+		// 得到参数类型
+		Class<?> cl = getMethod.getReturnType();
+		// set方法
+		Method setMethod = bean.getClass().getMethod("set" + funName,
+				new Class[] { cl });
+
+		// 当参数为空时直接赋予NULL值
+		if (value == null || value==0) {
+			setMethod.invoke(bean, new Object[] { null });
+			return;
+		}
+
+		// 根据不同的系统对象转换
+		if (cl == String.class) {
+			setMethod.invoke(bean, new Object[] { value });
+			return;
+		} else if (cl == Integer.class || cl == Float.class || cl == Long.class
+				|| cl == Double.class || cl == Byte.class
+				|| cl == Boolean.class || cl == Character.class) {
+			Method valueOf = cl.getMethod("valueOf",new Class[] { String.class });
+			
+			Object valueObj = valueOf.invoke(cl, new Object[] { value });
+			setMethod.invoke(bean, new Object[] { valueObj });
+		} else if (cl == java.util.Date.class || cl == java.sql.Date.class) {
+			Object bindDate = new Date(new Long(value));
+			setMethod.invoke(bean, new Object[] { bindDate });
+		}
+	}
+	
 	public static void bindProperty(Object bean, String propertyName,Date date) throws NoSuchMethodException,
 			InvocationTargetException, IllegalAccessException, ParseException,
 			InstantiationException {
@@ -173,7 +210,7 @@ public class DbBridgingBean {
 			prefix = null;
 		}
 
-		enableCase = DbConfig.getProperty("Db.case").equals("true");
+//		boolean enableCase = DbConfig.getProperty("Db.case").equals("true");
 
 		Connection con = null;
 		Statement stmt = null;

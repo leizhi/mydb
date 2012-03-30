@@ -66,7 +66,15 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 						DbBridgingBean.bindProperty(bean,
 								StringUtils.formatHump(rsmd.getColumnName(i),null),
 								result.getTimestamp(i));
-					}else {
+					}else if(type == Types.DATE){
+						DbBridgingBean.bindProperty(bean,
+								StringUtils.formatHump(rsmd.getColumnName(i),null),
+								result.getDate(i));	
+					}else if(type == Types.BIGINT){
+						DbBridgingBean.bindProperty(bean,
+								StringUtils.formatHump(rsmd.getColumnName(i),null),
+								result.getLong(i));	
+					}else{
 						DbBridgingBean.bindProperty(bean,
 								StringUtils.formatHump(rsmd.getColumnName(i),null),
 								result.getString(i));	
@@ -336,11 +344,11 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 					
 					if(type == Types.TIMESTAMP){
 						DbBridgingBean.bindProperty(entity,
-								StringUtils.prefixToUpper(rsmd.getColumnName(i),null),
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
 								result.getTimestamp(i));
 					}else {
 						DbBridgingBean.bindProperty(entity,
-								StringUtils.prefixToUpper(rsmd.getColumnName(i),null),
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
 								result.getString(i));
 					}
 				}

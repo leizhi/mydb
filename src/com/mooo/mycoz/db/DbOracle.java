@@ -65,11 +65,11 @@ public class DbOracle extends OracleSQL implements DbProcess{
 					
 					if(type == Types.TIMESTAMP){
 						DbBridgingBean.bindProperty(bean,
-								StringUtils.prefixToUpper(rsmd.getColumnName(i),"_"),
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),"_",false),
 								result.getTimestamp(i));
 					}else {
 						DbBridgingBean.bindProperty(bean,
-								StringUtils.prefixToUpper(rsmd.getColumnName(i),"_"),
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),"_",false),
 								result.getString(i));
 					}
 
@@ -337,11 +337,11 @@ public class DbOracle extends OracleSQL implements DbProcess{
 					
 					if(type == Types.TIMESTAMP){
 						DbBridgingBean.bindProperty(entity,
-								StringUtils.prefixToUpper(rsmd.getColumnName(i),null),
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,false),
 								result.getTimestamp(i));
 					}else {
 						DbBridgingBean.bindProperty(entity,
-								StringUtils.prefixToUpper(rsmd.getColumnName(i),null),
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,false),
 								result.getString(i));
 					}
 				}
