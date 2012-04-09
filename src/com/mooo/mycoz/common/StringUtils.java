@@ -298,7 +298,74 @@ public class StringUtils {
 		}
 		return buf.toString();
 	}
-
+	/**
+	 * Convert char to byte
+	 * 
+	 * @param c
+	 *            char
+	 * @return byte
+	 */
+	private static byte toByte(char c) {
+		return (byte) "0123456789ABCDEF".indexOf(c);
+	}
+	
+	/**
+	 * Convert hex string to byte[]
+	 * 
+	 * @param hexString
+	 *            the hex string
+	 * @return byte[]
+	 */
+	public static byte[] toBytes(String hex) {
+		if (hex == null || hex.equals("")) {
+			return null;
+		}
+		hex = hex.toUpperCase();
+		int length = hex.length() / 2;
+		char[] hexChars = hex.toCharArray();
+		byte[] d = new byte[length];
+		for (int i = 0; i < length; i++) {
+			int pos = i * 2;
+			d[i] = (byte) (toByte(hexChars[pos]) << 4 | toByte(hexChars[pos + 1]));
+		}
+		return d;
+	}
+	/**
+	 * Convert byte[4] to short
+	 * 
+	 * @param bytes
+	 *        byte[4]
+	 * @return long
+	 */
+	public static long toInt(byte[] bytes) {
+		int mask = 0xff;
+		int temp = 0;
+		long n = 0;
+		for (int i = 0; i < 4 ; i++) {
+			n <<= 8;
+			temp = bytes[i] & mask;
+			n |= temp;
+		}
+		return n;
+	}
+	/**
+	 * Convert byte[2] to short
+	 * 
+	 * @param bytes
+	 *        byte[2]
+	 * @return short
+	 */
+	public static short toShort(byte[] bytes) {
+		int mask = 0xff;
+		int temp = 0;
+		short n = 0;
+		for (int i = 0; i < 2 ; i++) {
+			n <<= 4;
+			temp = bytes[i] & mask;
+			n |= temp;
+		}
+		return n;
+	}
 	/**
 	 * Converts a line of text into an array of lower case words. Words are
 	 * delimited by the following characters: , .\r\n:/\+
