@@ -366,6 +366,33 @@ public class StringUtils {
 		}
 		return n;
 	}
+	
+	public static byte[] subBytes(byte[] src,int begin,int offset) {
+		byte[] subBytes = new byte[offset];
+		for(int i=0;i<offset;i++){
+			subBytes[i] = src[begin+i];
+		}
+		return subBytes;
+	}
+	
+	public static boolean rightLRC(byte[] bytes){
+		byte clc = 0x00;
+		if(bytes == null || bytes.length==1){
+			return false;
+		}
+		
+		int length = bytes.length;
+		
+		for(int i=0;i<length-1;i++){
+			clc = (byte) (clc ^ bytes[i]);
+		}
+		
+		if(clc == bytes[length-1]){
+			return true;
+		}else{
+			return false;
+		}
+	}
 	/**
 	 * Converts a line of text into an array of lower case words. Words are
 	 * delimited by the following characters: , .\r\n:/\+
