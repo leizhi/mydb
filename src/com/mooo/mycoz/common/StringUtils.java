@@ -331,6 +331,25 @@ public class StringUtils {
 		return d;
 	}
 	/**
+	 * swap by bytes
+	 * 
+	 * @param bytes
+	 *
+	 * @return bytes
+	 */
+	public static byte[] swapBytes(byte[] bytes){
+		if(bytes==null || bytes.length <2)
+			return null;
+		
+		byte[] nbytes = new byte[bytes.length];
+		
+		for(int i=0;i<bytes.length;i++){
+			nbytes[i]=bytes[bytes.length-1-i];
+		}
+		
+		return nbytes;
+	}
+	/**
 	 * Convert byte[4] to short
 	 * 
 	 * @param bytes
