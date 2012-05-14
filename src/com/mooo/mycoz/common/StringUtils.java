@@ -819,15 +819,14 @@ public class StringUtils {
 		return result;
 	}
 	
-	//default not spilt
-	public synchronized static final String upperToPrefix(String str){
-		return upperToPrefix(str,null);
-	}
-	
-	public synchronized static final String upperToPrefix(String str,String prefix){
+	//split for prefix
+	public synchronized static final String upperToPrefix(String str,String prefix,boolean beginEnable){
 
 		if(prefix==null || prefix.equals("")){
-				return str;
+				if(beginEnable)
+					return str;
+				else
+					return str.substring(0, 1).toLowerCase()+str.substring(1);
 		}
 		
 		String result="";
@@ -844,6 +843,23 @@ public class StringUtils {
 		}
 		
 		return result;
+	}
+	//split for prefix,enable begin
+	public synchronized static final String upperToPrefix(String str,String prefix){
+		return upperToPrefix(str,prefix,true);
+	}
+	//split for prefix,not enable begin
+	public synchronized static final String upperToPrefixNot(String str,String prefix){
+		return upperToPrefix(str,prefix,false);
+	}
+	
+	//default not split,enable begin
+	public synchronized static final String upperToPrefix(String str){
+		return upperToPrefix(str,null);
+	}
+	//default not split,not enable begin
+	public synchronized static final String upperToPrefixNot(String str){
+		return upperToPrefixNot(str,null);
 	}
 	
 	//default split case , specially prefix

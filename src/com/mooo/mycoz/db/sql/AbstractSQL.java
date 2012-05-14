@@ -54,7 +54,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 	private StringBuilder updateSql;
 	private StringBuilder deleteSql;
 	private StringBuilder searchSql;
-	private StringBuilder countSql;
+//	private String countSql;
 
 	private Map<String, Field> fields;
 	private Map<String, Object> columnValues;
@@ -132,16 +132,12 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 		enableCase = DbConfig.getProperty("Db.case").equals("true");
 		
 		if(sc){
-			if(!StringUtils.isNull(catalog)){
-				refresh(catalog,
-						StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
-			}else{
-				refresh(StringUtils.getCatalog(entity.getClass(),1),
-						StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
-			}
+			if(StringUtils.isNull(catalog))
+				catalog = StringUtils.getCatalog(entity.getClass(),1);
+			
+			refresh(catalog,StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
 		}else{
-			refresh(null,
-					StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
+			refresh(null,StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
 		}
 		
 		entityFillField(entity);
@@ -173,21 +169,18 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 		updateSql = new StringBuilder("UPDATE ");
 		deleteSql = new StringBuilder("DELETE FROM ");
 		searchSql = new StringBuilder("SELECT * FROM ");
-		countSql = new StringBuilder("SELECT COUNT(*) AS total FROM ");
 
 		if(catalog != null) {
 			saveSql.append(catalog + ".");
 			updateSql.append(catalog + ".");
 			deleteSql.append(catalog + ".");
 			searchSql.append(catalog + ".");
-			countSql.append(catalog + ".");
 		}
 		
 		saveSql.append(table);
 		updateSql.append(table + " SET ");
 		deleteSql.append(table);
 		searchSql.append(table);
-		countSql.append(table);
 
 		fields = new HashMap<String, Field>();
 		columnValues = new HashMap<String, Object>();
@@ -208,24 +201,21 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 		updateSql = new StringBuilder("UPDATE ");
 		deleteSql = new StringBuilder("DELETE FROM ");
 		searchSql = new StringBuilder("SELECT * FROM ");
-		countSql = new StringBuilder("SELECT COUNT(*) AS total FROM ");
 
 		if(catalog != null) {
 			saveSql.append(catalog + ".");
 			updateSql.append(catalog + ".");
 			deleteSql.append(catalog + ".");
 			searchSql.append(catalog + ".");
-			countSql.append(catalog + ".");
 		}
 		
 		saveSql.append(table);
 		updateSql.append(table + " SET ");
 		deleteSql.append(table);
 		searchSql.append(table);
-		countSql.append(table);
 	}
 	
-	///////////////////////////////
+	//setField
 	public void setField(String field, String value) {
 		try {
 			if (field == null || value == null)
@@ -272,8 +262,9 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 	}
 	
 	public void setLike(String field) {
-		if (fields.containsKey(field)) {
+		if (fields!=null && fields.containsKey(field)) {
 			Field likeField = (Field) fields.get(field);
+			
 			likeField.setWhereByLike(true);
 			likeField.setWhereByEqual(false);
 			likeField.setWhereByGreaterEqual(false);
@@ -282,7 +273,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 	}
 	
 	public void setGreaterEqual(String field) {
-		if (fields.containsKey(field)) {
+		if (fields!=null && fields.containsKey(field)) {
 			Field geField = (Field) fields.get(field);
 			geField.setWhereByLike(false);
 			geField.setWhereByEqual(false);
@@ -292,7 +283,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 	}
 	
 	public void setLessEqual(String field) {
-		if (fields.containsKey(field)) {
+		if (fields!=null && fields.containsKey(field)) {
 			Field leField = (Field) fields.get(field);
 			leField.setWhereByLike(false);
 			leField.setWhereByEqual(false);
@@ -477,6 +468,8 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 	}
 
 	public String updateSQL(Object entity) {
+		refresh(entity);
+		
 		if(fields == null || columnValues == null)
 			return null;
 		
@@ -491,7 +484,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 		
 			if(field.isUpdate()) {
 				isUpdate = true;
-				if (DbUtil.isPrimaryKey(this.getTable(),field.getName())) {
+				if (DbUtil.isPrimaryKey(this.catalog, this.getTable(),field.getName())) {
 					byWhere = true;
 					
 					if(obj.getClass().isAssignableFrom(Integer.class)){
@@ -524,55 +517,8 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 				} else {
 					updateSql.append(field.getName()+" = '"+obj +"',");
 				}
-
 			}
-			
-			// where build
-			/*
-			if(field.isWhereByEqual()) {
-				byWhere = true;
-				
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					whereBy.append(field.getName()+" = "+obj +" AND ");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					whereBy.append(field.getName()+" = date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					whereBy.append(field.getName()+" = "+obj +" AND ");
-				} else {
-					whereBy.append(field.getName()+" = '"+obj +"' AND ");
-				}
-			}
-			
-			if(field.isWhereByGreaterEqual()) {
-				byWhere = true;
-				
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					whereBy.append(field.getName()+" >= "+obj +" AND ");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					whereBy.append(field.getName()+" >= date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					whereBy.append(field.getName()+" >= "+obj +" AND ");
-				} else {
-					whereBy.append(field.getName()+" >= '"+obj +"' AND ");
-				}
-			}
-
-			if(field.isWhereByLessEqual()) {
-				byWhere = true;
-
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					whereBy.append(field.getName()+" <= "+obj +" AND ");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					whereBy.append(field.getName()+" <= date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					whereBy.append(field.getName()+" <= "+obj +" AND ");
-				} else {
-					whereBy.append(field.getName()+" <= '"+obj +"' AND ");
-				}
-			} */
-			// build end
-			
-		}
+		}// build end
 		
 		if(byWhere)
 			whereBy.delete(whereBy.lastIndexOf("AND"),whereBy.lastIndexOf("AND")+3);
@@ -596,7 +542,6 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 
 		try {	
 			Field field;
-			String key;
 	
 			Object obj;
 			int columnType = 0;
@@ -607,7 +552,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 				ExtentField<?> extentField = extentValues.get(eKey);
 				obj = extentField.getStart();
 
-				columnType = DbUtil.type(null,getCatalog(),getTable(),StringUtils.upperToPrefix(eKey,prefix));
+				columnType = DbUtil.type(null,getCatalog(),getTable(),StringUtils.upperToPrefixNot(eKey,prefix));
 				
 				if(obj.getClass().isAssignableFrom(Integer.class)){
 					whereBy.append(eKey+" >= "+extentField.getStart() +" AND ");
@@ -629,14 +574,12 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 				}
 			}
 			
-			for (Iterator<?> it = fields.keySet().iterator(); it.hasNext();) {
-			
-				key = (String) it.next();
+			for (String key:fields.keySet()) {
+
 				field = (Field) fields.get(key);
-				
 				obj = columnValues.get(key);
 				
-				if(field.isWhereByEqual()) {
+				if(field.isWhereByEqual() && obj!=null) {
 					byWhere = true;
 					
 					if(obj.getClass().isAssignableFrom(Integer.class)){
@@ -654,7 +597,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					}
 				}
 				
-				if(field.isWhereByGreaterEqual()) {
+				if(field.isWhereByGreaterEqual() && obj!=null) {
 					byWhere = true;
 					
 					if(obj.getClass().isAssignableFrom(Integer.class)){
@@ -672,7 +615,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					}
 				}
 	
-				if(field.isWhereByLessEqual()) {
+				if(field.isWhereByLessEqual() && obj!=null) {
 					byWhere = true;
 	
 					if(obj.getClass().isAssignableFrom(Integer.class)){
@@ -690,10 +633,10 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					}
 				}
 	
-				if(field.isWhereByLike()) {
+				if(field.isWhereByLike() && obj!=null) {
 					byWhere = true;
 	
-					if(obj.getClass().isAssignableFrom(Integer.class)){
+					if(obj.getClass().isAssignableFrom(Integer.class) || obj.getClass().isAssignableFrom(Double.class)){
 						whereBy.append(field.getName()+" LIKE "+obj +" AND ");
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
 						if(field.getType()==Types.TIMESTAMP){
@@ -701,8 +644,6 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 						} else {
 							whereBy.append(field.getName()+" LIKE date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
 						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" LIKE "+obj +" AND ");
 					} else {
 						whereBy.append(field.getName()+" LIKE '%"+obj +"%' AND ");
 					}
@@ -747,153 +688,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 	}
 	
 	public String countSQL(Object entity) {
-		
-		if(fields == null || columnValues == null)
-			return null;
-		
-		try {
-			Field field;
-			String key;
-			
-			Object obj;
-			int columnType = 0;
-			
-			for(String eKey: extentValues.keySet()){
-				byWhere = true;
-
-				ExtentField<?> extentField = extentValues.get(eKey);
-				obj = extentField.getStart();
-
-				columnType = DbUtil.type(null,getCatalog(),getTable(),StringUtils.upperToPrefix(eKey,prefix));
-
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					whereBy.append(eKey+" >= "+extentField.getStart() +" AND ");
-					whereBy.append(eKey+" <= "+extentField.getEnd() +" AND ");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					if(columnType==Types.TIMESTAMP){
-						whereBy.append(eKey+" >= date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(extentField.getStart()) +"' AND ");
-						whereBy.append(eKey+" <= date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(extentField.getEnd()) +"' AND ");
-					} else {
-						whereBy.append(eKey+" >= date'"+new SimpleDateFormat("yyyy-MM-dd").format(extentField.getStart()) +"' AND ");
-						whereBy.append(eKey+" <= date'"+new SimpleDateFormat("yyyy-MM-dd").format(extentField.getEnd()) +"' AND ");
-					}
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					whereBy.append(eKey+" >= "+extentField.getStart() +" AND ");
-					whereBy.append(eKey+" <= "+extentField.getEnd() +" AND ");
-				} else {
-					whereBy.append(eKey+" >= '"+extentField.getStart() +"' AND ");
-					whereBy.append(eKey+" <= '"+extentField.getEnd() +"' AND ");
-				}
-			}
-			
-			for (Iterator<?> it = fields.keySet().iterator(); it.hasNext();) {
-			
-				key = (String) it.next();
-				field = (Field) fields.get(key);
-				
-				obj = columnValues.get(key);
-				
-				if(field.isWhereByEqual()) {
-					byWhere = true;
-					
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						whereBy.append(field.getName()+" = "+obj +" AND ");
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-						if(field.getType()==Types.TIMESTAMP){
-							whereBy.append(field.getName()+" = date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
-						} else {
-							whereBy.append(field.getName()+" = date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" = "+obj +" AND ");
-					} else {
-						whereBy.append(field.getName()+" = '"+obj +"' AND ");
-					}
-				}
-				
-				if(field.isWhereByGreaterEqual()) {
-					byWhere = true;
-					
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						whereBy.append(field.getName()+" >= "+obj +" AND ");
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-						if(field.getType()==Types.TIMESTAMP){
-							whereBy.append(field.getName()+" >= date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
-						} else {
-							whereBy.append(field.getName()+" >= date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" >= "+obj +" AND ");
-					} else {
-						whereBy.append(field.getName()+" >= '"+obj +"' AND ");
-					}
-				}
-	
-				if(field.isWhereByLessEqual()) {
-					byWhere = true;
-	
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						whereBy.append(field.getName()+" <= "+obj +" AND ");
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-						if(field.getType()==Types.TIMESTAMP){
-							whereBy.append(field.getName()+" <= date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
-						} else {
-							whereBy.append(field.getName()+" <= date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" <= "+obj +" AND ");
-					} else {
-						whereBy.append(field.getName()+" <= '"+obj +"' AND ");
-					}
-				}
-	
-				if(field.isWhereByLike()) {
-					byWhere = true;
-	
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						whereBy.append(field.getName()+" LIKE "+obj +" AND ");
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-						if(field.getType()==Types.TIMESTAMP){
-							whereBy.append(field.getName()+" LIKE date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
-						} else {
-							whereBy.append(field.getName()+" LIKE date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" LIKE "+obj +" AND ");
-					} else {
-						whereBy.append(field.getName()+" LIKE '%"+obj +"%' AND ");
-					}
-				}
-			}
-			
-			if(byWhere)
-				whereBy.delete(whereBy.lastIndexOf("AND"),whereBy.lastIndexOf("AND")+3);
-					
-			if(isSearch){
-				if(countSql.lastIndexOf(",") > 0)
-					countSql.deleteCharAt(countSql.lastIndexOf(","));
-				
-				if(byWhere) {
-					countSql.append(whereBy);
-				}
-				
-				if(byGroup) {
-					countSql.append(groupBy);
-				}
-				
-				if(byOrder) {
-					countSql.append(orderBy);
-				}
-	
-				if(byLimit)
-					countSql.append(limitBy);
-			}
-			
-			if(log.isDebugEnabled())log.debug("countSql="+countSql);
-			return countSql.toString();
-		} finally {
-			refreshSQL();
-		}
+		return "SELECT COUNT(*) FROM ("+searchSQL(entity)+") result";
 	}
 	
 	public void entityFillField(Object entity) {
@@ -915,20 +710,20 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					
 					if(obj !=null) {
 						field = method.substring(method.indexOf("get")+3);
-						columnType = DbUtil.type(null,getCatalog(),getTable(),StringUtils.upperToPrefix(field,prefix));
+						columnType = DbUtil.type(null,getCatalog(),getTable(),StringUtils.upperToPrefixNot(field,prefix));
 						
 						if(obj.getClass().isAssignableFrom(Integer.class))
-							setField(StringUtils.upperToPrefix(field,prefix), (Integer)obj);
+							setField(StringUtils.upperToPrefixNot(field,prefix), (Integer)obj);
 						else if(obj.getClass().isAssignableFrom(String.class)){
-							setField(StringUtils.upperToPrefix(field,prefix), (String)obj);
+							setField(StringUtils.upperToPrefixNot(field,prefix), (String)obj);
 						}else if(obj.getClass().isAssignableFrom(Date.class)){
 							if(columnType == Types.TIMESTAMP){
-								setField(StringUtils.upperToPrefix(field,prefix), (Date)obj,Types.TIMESTAMP);
+								setField(StringUtils.upperToPrefixNot(field,prefix), (Date)obj,Types.TIMESTAMP);
 							} else{
-								setField(StringUtils.upperToPrefix(field,prefix), (Date)obj,columnType);
+								setField(StringUtils.upperToPrefixNot(field,prefix), (Date)obj,columnType);
 							}
 						}else if(obj.getClass().isAssignableFrom(Double.class)){
-							setField(StringUtils.upperToPrefix(field,prefix), (Double)obj);
+							setField(StringUtils.upperToPrefixNot(field,prefix), (Double)obj);
 						}
 					}
 				}

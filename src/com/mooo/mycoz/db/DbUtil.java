@@ -17,7 +17,7 @@ public class DbUtil {
     private static Object initLock = new Object();
     private static HashMap<String,List<String>> primaryKeys;
 
-    public static boolean isPrimaryKey(String table,String field) {
+    public static boolean isPrimaryKey(String catalog,String table,String field) {
 		if (primaryKeys == null) {
 			synchronized (initLock) {
 				if (primaryKeys == null ) {
@@ -26,13 +26,13 @@ public class DbUtil {
 			}
 		}
         
-		if(!primaryKeys.containsKey(table)){
-			primaryKeys.put(table, primaryKey(null, table));
+		if(!primaryKeys.containsKey(catalog+"."+table)){
+			primaryKeys.put(catalog+"."+table, primaryKey(null, catalog,table));
 		}
 		
 		try {
-			if (primaryKeys.containsKey(table)) {
-				if (primaryKeys.get(table).contains(field.toLowerCase())){
+			if (primaryKeys.containsKey(catalog+"."+table)) {
+				if (primaryKeys.get(catalog+"."+table).contains(field.toLowerCase())){
 					return true;
 				}
 			}
@@ -43,7 +43,7 @@ public class DbUtil {
 		return false;
     }
 	
-	public static List<String> primaryKey(Connection connection,String table) {
+	public static List<String> primaryKey(Connection connection,String catalog,String table) {
 		
 		List<String> retrieveList = null;
 		
@@ -63,7 +63,7 @@ public class DbUtil {
 				isClose = true;
 			}
 
-			result = myConn.getMetaData().getPrimaryKeys(null,null, StringUtils.upperToPrefix(table, null));
+			result = myConn.getMetaData().getPrimaryKeys(catalog,null, StringUtils.upperToPrefix(table, null));
 			
 			while (result.next()) {
 				retrieveList.add(result.getString(4).toLowerCase());

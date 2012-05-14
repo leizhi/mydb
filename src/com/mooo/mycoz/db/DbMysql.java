@@ -25,7 +25,7 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 			throws SQLException {
 		
 		if (noQuery) {
-			refresh(entity);
+			refresh(entity);//entity data fill to execute SQL
 		}
 		
 		List<Object> retrieveList = null;
@@ -282,6 +282,7 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 			}
 			
 			stmt = myConn.createStatement();
+			System.out.println(doSql);
 			stmt.execute(doSql);
 		}finally {
 	
@@ -346,6 +347,10 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 						DbBridgingBean.bindProperty(entity,
 								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
 								result.getTimestamp(i));
+					}else if(type == Types.DATE){
+						DbBridgingBean.bindProperty(entity,
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
+								result.getDate(i));
 					}else {
 						DbBridgingBean.bindProperty(entity,
 								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
