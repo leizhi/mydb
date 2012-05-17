@@ -583,17 +583,26 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					byWhere = true;
 					
 					if(obj.getClass().isAssignableFrom(Integer.class)){
-						whereBy.append(field.getName()+" = "+obj +" AND ");
+						Integer value = (Integer)obj;
+						if(value!=null && value!=0){
+							whereBy.append(field.getName()+" = "+value +" AND ");
+						}
+					}else if(obj.getClass().isAssignableFrom(Double.class)){
+						Double value = (Double)obj;
+						if(value!=null && value!=0){
+							whereBy.append(field.getName()+" = "+value +" AND ");
+						}
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
 						if(field.getType()==Types.TIMESTAMP){
 							whereBy.append(field.getName()+" = date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
 						} else {
 							whereBy.append(field.getName()+" = date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
 						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" = "+obj +" AND ");
-					} else {
-						whereBy.append(field.getName()+" = '"+obj +"' AND ");
+					}else if(obj.getClass().isAssignableFrom(String.class)){
+						String value = (String)obj;
+						if(value!=null && !value.equals("")){
+							whereBy.append(field.getName()+" = '"+value +"' AND ");
+						}
 					}
 				}
 				
@@ -601,17 +610,26 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					byWhere = true;
 					
 					if(obj.getClass().isAssignableFrom(Integer.class)){
-						whereBy.append(field.getName()+" >= "+obj +" AND ");
+						Integer value = (Integer)obj;
+						if(value!=null && value!=0){
+							whereBy.append(field.getName()+" >= "+value +" AND ");
+						}
+					}else if(obj.getClass().isAssignableFrom(Double.class)){
+						Double value = (Double)obj;
+						if(value!=null && value!=0){
+							whereBy.append(field.getName()+" >= "+value +" AND ");
+						}
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
 						if(field.getType()==Types.TIMESTAMP){
 							whereBy.append(field.getName()+" >= date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
 						} else {
 							whereBy.append(field.getName()+" >= date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
 						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" >= "+obj +" AND ");
 					} else {
-						whereBy.append(field.getName()+" >= '"+obj +"' AND ");
+						String value = (String)obj;
+						if(value!=null && !value.equals("")){
+							whereBy.append(field.getName()+" >= '"+value +"' AND ");
+						}
 					}
 				}
 	
@@ -619,25 +637,42 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					byWhere = true;
 	
 					if(obj.getClass().isAssignableFrom(Integer.class)){
-						whereBy.append(field.getName()+" <= "+obj +" AND ");
+						Integer value = (Integer)obj;
+						if(value!=null && value!=0){
+							whereBy.append(field.getName()+" <= "+value +" AND ");
+						}
+					}else if(obj.getClass().isAssignableFrom(Double.class)){
+						Double value = (Double)obj;
+						if(value!=null && value!=0){
+							whereBy.append(field.getName()+" <= "+value +" AND ");
+						}
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
 						if(field.getType()==Types.TIMESTAMP){
 							whereBy.append(field.getName()+" <= date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
 						} else {
 							whereBy.append(field.getName()+" <= date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
 						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" <= "+obj +" AND ");
 					} else {
-						whereBy.append(field.getName()+" <= '"+obj +"' AND ");
+						String value = (String)obj;
+						if(value!=null && !value.equals("")){
+							whereBy.append(field.getName()+" <= '"+value +"' AND ");
+						}
 					}
 				}
 	
 				if(field.isWhereByLike() && obj!=null) {
 					byWhere = true;
 	
-					if(obj.getClass().isAssignableFrom(Integer.class) || obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" LIKE "+obj +" AND ");
+					if(obj.getClass().isAssignableFrom(Integer.class)){
+						Integer value = (Integer)obj;
+						if(value!=null && value!=0){
+							whereBy.append(field.getName()+" LIKE "+value +" AND ");
+						}
+					}else if(obj.getClass().isAssignableFrom(Double.class)){
+						Double value = (Double)obj;
+						if(value!=null && value!=0){
+							whereBy.append(field.getName()+" LIKE "+value +" AND ");
+						}
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
 						if(field.getType()==Types.TIMESTAMP){
 							whereBy.append(field.getName()+" LIKE date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
@@ -645,7 +680,10 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 							whereBy.append(field.getName()+" LIKE date'"+new SimpleDateFormat("yyyy-MM-dd").format(((Date)obj)) +"' AND ");
 						}
 					} else {
-						whereBy.append(field.getName()+" LIKE '%"+obj +"%' AND ");
+						String value = (String)obj;
+						if(value!=null && !value.equals("")){
+							whereBy.append(field.getName()+" LIKE '%"+value +"%' AND ");
+						}
 					}
 				}
 			}
