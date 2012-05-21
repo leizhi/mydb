@@ -120,9 +120,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 		this.enableCase = enableCase;
 	}
 	
-	abstract public void refresh(Object entity);
-	
-	public void refresh(Object entity,boolean sc){
+	public void refresh(Object entity){
 		prefix = DbConfig.getProperty("Db.humpInterval");
 		
 		if(prefix !=null && prefix.equals("case")){
@@ -131,14 +129,10 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 		
 		enableCase = DbConfig.getProperty("Db.case").equals("true");
 		
-		if(sc){
-			if(StringUtils.isNull(catalog))
-				catalog = StringUtils.getCatalog(entity.getClass(),1);
-			
-			refresh(catalog,StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
-		}else{
-			refresh(null,StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
-		}
+		if(StringUtils.isNull(catalog))
+			catalog = StringUtils.getCatalog(entity.getClass(),1);
+		
+		refresh(catalog,StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
 		
 		entityFillField(entity);
 	}
@@ -580,19 +574,22 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 				obj = columnValues.get(key);
 				
 				if(field.isWhereByEqual() && obj!=null) {
-					byWhere = true;
 					
 					if(obj.getClass().isAssignableFrom(Integer.class)){
 						Integer value = (Integer)obj;
 						if(value!=null && value!=0){
+							byWhere = true;
 							whereBy.append(field.getName()+" = "+value +" AND ");
 						}
 					}else if(obj.getClass().isAssignableFrom(Double.class)){
 						Double value = (Double)obj;
 						if(value!=null && value!=0){
+							byWhere = true;
 							whereBy.append(field.getName()+" = "+value +" AND ");
 						}
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
+						byWhere = true;
+						
 						if(field.getType()==Types.TIMESTAMP){
 							whereBy.append(field.getName()+" = date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
 						} else {
@@ -601,25 +598,29 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					}else if(obj.getClass().isAssignableFrom(String.class)){
 						String value = (String)obj;
 						if(value!=null && !value.equals("")){
+							byWhere = true;
 							whereBy.append(field.getName()+" = '"+value +"' AND ");
 						}
 					}
 				}
 				
 				if(field.isWhereByGreaterEqual() && obj!=null) {
-					byWhere = true;
 					
 					if(obj.getClass().isAssignableFrom(Integer.class)){
 						Integer value = (Integer)obj;
 						if(value!=null && value!=0){
+							byWhere = true;
 							whereBy.append(field.getName()+" >= "+value +" AND ");
 						}
 					}else if(obj.getClass().isAssignableFrom(Double.class)){
 						Double value = (Double)obj;
 						if(value!=null && value!=0){
+							byWhere = true;
 							whereBy.append(field.getName()+" >= "+value +" AND ");
 						}
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
+						byWhere = true;
+						
 						if(field.getType()==Types.TIMESTAMP){
 							whereBy.append(field.getName()+" >= date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
 						} else {
@@ -628,25 +629,29 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					} else {
 						String value = (String)obj;
 						if(value!=null && !value.equals("")){
+							byWhere = true;
 							whereBy.append(field.getName()+" >= '"+value +"' AND ");
 						}
 					}
 				}
 	
 				if(field.isWhereByLessEqual() && obj!=null) {
-					byWhere = true;
 	
 					if(obj.getClass().isAssignableFrom(Integer.class)){
 						Integer value = (Integer)obj;
 						if(value!=null && value!=0){
+							byWhere = true;
 							whereBy.append(field.getName()+" <= "+value +" AND ");
 						}
 					}else if(obj.getClass().isAssignableFrom(Double.class)){
 						Double value = (Double)obj;
 						if(value!=null && value!=0){
+							byWhere = true;
 							whereBy.append(field.getName()+" <= "+value +" AND ");
 						}
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
+						byWhere = true;
+						
 						if(field.getType()==Types.TIMESTAMP){
 							whereBy.append(field.getName()+" <= date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
 						} else {
@@ -655,25 +660,29 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					} else {
 						String value = (String)obj;
 						if(value!=null && !value.equals("")){
+							byWhere = true;
 							whereBy.append(field.getName()+" <= '"+value +"' AND ");
 						}
 					}
 				}
 	
 				if(field.isWhereByLike() && obj!=null) {
-					byWhere = true;
 	
 					if(obj.getClass().isAssignableFrom(Integer.class)){
 						Integer value = (Integer)obj;
 						if(value!=null && value!=0){
+							byWhere = true;
 							whereBy.append(field.getName()+" LIKE "+value +" AND ");
 						}
 					}else if(obj.getClass().isAssignableFrom(Double.class)){
 						Double value = (Double)obj;
 						if(value!=null && value!=0){
+							byWhere = true;
 							whereBy.append(field.getName()+" LIKE "+value +" AND ");
 						}
 					}else if(obj.getClass().isAssignableFrom(Date.class)){
+						byWhere = true;
+						
 						if(field.getType()==Types.TIMESTAMP){
 							whereBy.append(field.getName()+" LIKE date'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(((Date)obj)) +"' AND ");
 						} else {
@@ -682,6 +691,7 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					} else {
 						String value = (String)obj;
 						if(value!=null && !value.equals("")){
+							byWhere = true;
 							whereBy.append(field.getName()+" LIKE '%"+value +"%' AND ");
 						}
 					}

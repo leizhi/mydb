@@ -19,10 +19,6 @@ public class MysqlSQL extends AbstractSQL {
 			setByLimit(true);
 	}
 
-	public void refresh(Object entity){
-		refresh(entity,true);
-	}
-	
 	public String selfDateSQL(Date date) {
 		return "date'"+new SimpleDateFormat("yyyy-MM-dd").format(date) +"',";
 	}

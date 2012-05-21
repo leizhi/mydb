@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.mooo.mycoz.common.StringUtils;
@@ -65,7 +66,19 @@ public class DbBridgingBean {
 			Object valueObj = valueOf.invoke(cl, new Object[] { value });
 			setMethod.invoke(bean, new Object[] { valueObj });
 		} else if(cl == java.util.Date.class || cl == java.sql.Date.class){
-			Object bindDate = new Date( new Long(value));
+			SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat tformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			
+			Object bindDate;
+			
+			if(value.length()==10){
+				bindDate =  dformat.parse(value);
+			}else if(value.length()==19){
+				bindDate =  tformat.parse(value);
+			}else{
+				bindDate = new Date();
+			}
+			
 			setMethod.invoke(bean, new Object[] { bindDate });
 		}
 	}
@@ -274,7 +287,6 @@ public class DbBridgingBean {
 		buffer.append(StringUtils.prefixToUpperNot(table,prefix));
 		//buffer.append(" extends DBObject {\n");
 		buffer.append(" {\n");
-		buffer.append("\tprivate static final long serialVersionUID = 1L;\n");
 
 		System.out.println("beanName="+StringUtils.prefixToUpperNot(table,prefix));
 
