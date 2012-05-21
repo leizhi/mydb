@@ -129,8 +129,8 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 		
 		enableCase = DbConfig.getProperty("Db.case").equals("true");
 		
-		if(StringUtils.isNull(catalog))
-			catalog = StringUtils.getCatalog(entity.getClass(),1);
+//		if(StringUtils.isNull(catalog))
+		catalog = StringUtils.getCatalog(entity.getClass(),1);
 		
 		refresh(catalog,StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
 		
