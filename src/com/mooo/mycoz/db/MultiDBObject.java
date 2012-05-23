@@ -22,7 +22,6 @@ public class MultiDBObject extends DbMultiBulildSQL implements MultiSQLProcess{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4716776899444767709L;
 
 	public List<Object> searchAndRetrieveList() throws SQLException{
 		return searchAndRetrieveList(null);
