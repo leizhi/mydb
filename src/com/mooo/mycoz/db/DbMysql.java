@@ -311,12 +311,18 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 		
 		String doSql = searchSQL(entity);
 		
+		if(doSql==null || doSql.indexOf("WHERE") < 0){
+			return;
+		}
+		
 		int ls = doSql.indexOf("LIMIT");
 		if(ls>0)
 			doSql = doSql.substring(0,doSql.indexOf("LIMIT"));
 		
 		doSql += " LIMIT 1";
 	
+
+		
 		System.out.println("doSql:" + doSql);
 	
 		Connection myConn = null;
@@ -342,7 +348,11 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 			while (result.next()) {
 				for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
 					type = rsmd.getColumnType(i);
-					
+					if(type == Types.TIMESTAMP || type == Types.DATE){
+						DbBridgingBean.bindProperty(entity,
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
+								result.getTimestamp(i));
+					/*
 					if(type == Types.TIMESTAMP){
 						DbBridgingBean.bindProperty(entity,
 								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
@@ -351,7 +361,7 @@ public class DbMysql extends MysqlSQL implements DbProcess{
 						DbBridgingBean.bindProperty(entity,
 								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
 								result.getDate(i));
-					}else {
+					*/}else {
 						DbBridgingBean.bindProperty(entity,
 								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
 								result.getString(i));
