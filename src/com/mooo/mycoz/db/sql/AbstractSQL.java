@@ -87,19 +87,32 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 		for(Field field:entityField){
 
 			if(fieldName.equals(field.getFieldName())
-					&& field.getWhereRule().equals(Field.RULE_EQUAL)){
-				haveField=true;
+					&& field.getWhereRule().equals(Field.RULE_EQUAL)
+					&& fieldValue!=null){
 				
 				field.setFieldValue(fieldValue);
 				field.setFieldType(fieldType);
 				field.setWhereBy(whereBy);
 				field.setWhereRule(whereRule);
 				field.setPrimaryKey(isPrimaryKey);
+				
+				haveField=true;
+				break;
 			}
 		}
 		
-		if(!haveField)
-			entityField.add(new Field(fieldName,fieldValue,fieldType,whereBy,whereRule,isPrimaryKey));
+		if(!haveField && fieldValue!=null){
+			
+			if(fieldValue.getClass().isAssignableFrom(String.class)){
+				String value = fieldValue.toString();
+				
+				if(!StringUtils.isNull(value)){
+					entityField.add(new Field(fieldName,fieldValue,fieldType,whereBy,whereRule,isPrimaryKey));
+				}
+			}else{
+				entityField.add(new Field(fieldName,fieldValue,fieldType,whereBy,whereRule,isPrimaryKey));
+			}
+		}
 	}
 	
 	public void setField(String fieldName,Object fieldValue,int fieldType,boolean isPrimaryKey){
@@ -108,72 +121,88 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 	
 	
 	public void setLike(String fieldName,Object fieldValue){
-		boolean haveField = false;
-		
-		for(Field field:entityField){
-			if(fieldName.equals(field.getFieldName())
-					&& field.getWhereRule().equals(Field.RULE_LIKE)){
-				haveField=true;
-				
-				field.setFieldValue(fieldValue);
-//				field.setFieldType(1000);
-//				field.setWhereBy(Field.WHERE_BY_AND);
-//				field.setWhereRule(Field.RULE_LIKE);
-//				field.setPrimaryKey(false);
+		if(fieldName!=null && fieldValue!=null){
+			boolean haveField = false;
+			
+			for(Field field:entityField){
+				if(fieldName.equals(field.getFieldName())
+						&& field.getWhereRule().equals(Field.RULE_LIKE)){
+					
+					if(fieldValue.getClass().isAssignableFrom(String.class)){
+						String value = fieldValue.toString();
+						
+						if(!StringUtils.isNull(value)){
+							field.setFieldValue("%"+fieldValue+"%");
+	
+							haveField=true;
+							break;
+						}
+					}
+				}
+			}
+			
+			if(!haveField){
+					extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_LIKE,false));
 			}
 		}
-		
-		if(!haveField)
-			extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_LIKE,false));
 	}
 	
 	public void setGreaterEqual(String fieldName,Object fieldValue){
-		boolean haveField = false;
-		
-		for(Field field:entityField){
-			if(fieldName.equals(field.getFieldName())
-					&& field.getWhereRule().equals(Field.RULE_GREATER_EQUAL)){
-				haveField=true;
-				
-				field.setFieldValue(fieldValue);
+		if(fieldName!=null && fieldValue!=null){
+			boolean haveField = false;
+			for(Field field:entityField){
+				if(fieldName.equals(field.getFieldName())
+						&& field.getWhereRule().equals(Field.RULE_GREATER_EQUAL)){
+					
+					field.setFieldValue(fieldValue);
+					
+					haveField=true;
+					break;
+				}
 			}
+			
+			if(!haveField)
+				extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_GREATER_EQUAL,false));
 		}
-		
-		if(!haveField)
-			extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_GREATER_EQUAL,false));
 	}
 	
 	public void setLessEqual(String fieldName,Object fieldValue){
-		boolean haveField = false;
-		
-		for(Field field:entityField){
-			if(fieldName.equals(field.getFieldName())
-					&& field.getWhereRule().equals(Field.RULE_LESS_EQUAL)){
-				haveField=true;
-				
-				field.setFieldValue(fieldValue);
+		if(fieldName!=null && fieldValue!=null){
+			boolean haveField = false;
+			for(Field field:entityField){
+				if(fieldName.equals(field.getFieldName())
+						&& field.getWhereRule().equals(Field.RULE_LESS_EQUAL)){
+					
+					field.setFieldValue(fieldValue);
+					
+					haveField=true;
+					break;
+				}
 			}
+			
+			if(!haveField)
+				extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_LESS_EQUAL,false));
 		}
-		
-		if(!haveField)
-			extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_LESS_EQUAL,false));
 		
 	}
 	
 	public void setWhereIn(String fieldName,Object fieldValue){
-		boolean haveField = false;
-		
-		for(Field field:entityField){
-			if(fieldName.equals(field.getFieldName())
-					&& field.getWhereRule().equals(Field.RULE_IN)){
-				haveField=true;
-				
-				field.setFieldValue(fieldValue);
+		if(fieldName!=null && fieldValue!=null){
+			boolean haveField = false;
+			for(Field field:entityField){
+				if(fieldName.equals(field.getFieldName())
+						&& field.getWhereRule().equals(Field.RULE_IN)){
+					
+					field.setFieldValue(fieldValue);
+					
+					haveField=true;
+					break;
+				}
 			}
+			
+			if(!haveField)
+				extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_IN,false));
 		}
-		
-		if(!haveField)
-			extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_IN,false));
 	}
 	
 	public void addGroupBy(String fieldName){
@@ -264,6 +293,82 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 		}
 	}
 	
+	private String extendSQL(){
+		StringBuffer buffer = new StringBuffer();
+
+		//fill extend field
+		boolean isHead = true;
+		for(Field field:extendField){
+			
+			Object fieldValue = field.getFieldValue();
+			//Object choose
+			if(fieldValue!=null){
+				if(fieldValue.getClass().isAssignableFrom(Date.class)){
+					Date value = (Date)fieldValue;
+					
+					if(isHead) {
+						isHead = false;
+						buffer.append(" WHERE ");
+					}else{
+						buffer.append(field.getWhereBy());
+					}
+					
+					buffer.append(field.getFieldName() + field.getWhereRule());
+
+					if(field.getWhereRule().equals(Field.RULE_LIKE)){
+						if(field.getFieldType()==Types.TIMESTAMP){
+							buffer.append("date'%"+dtformat.format(value)+"%'");
+						}else if(field.getFieldType()==Types.DATE){
+							buffer.append("date'%"+dformat.format(value)+"%'");
+						}
+					}else{
+						if(field.getFieldType()==Types.TIMESTAMP){
+							buffer.append("date'"+dtformat.format(value)+"'");
+						}else if(field.getFieldType()==Types.DATE){
+							buffer.append("date'"+dformat.format(value)+"'");
+						}
+					}
+				}else if(fieldValue.getClass().isAssignableFrom(Integer.class)
+					||fieldValue.getClass().isAssignableFrom(Long.class)
+					||fieldValue.getClass().isAssignableFrom(Float.class)
+					||fieldValue.getClass().isAssignableFrom(Double.class)){
+					
+					if(isHead) {
+						isHead = false;
+						buffer.append(" WHERE ");
+					}else{
+						buffer.append(field.getWhereBy());
+					}
+					
+					buffer.append(field.getFieldName()+field.getWhereRule() + fieldValue);
+
+				}else if(fieldValue.getClass().isAssignableFrom(String.class)){
+					String value = (String)fieldValue;
+					
+					if(!value.equals("")){
+						if(isHead) {
+							isHead = false;
+							buffer.append(" WHERE ");
+						}else{
+							buffer.append(field.getWhereBy());
+						}
+						
+						buffer.append(field.getFieldName()+field.getWhereRule());
+
+						if(field.getWhereRule().equals(Field.RULE_LIKE)){
+							buffer.append("'%"+value+"%'");
+						}else{
+							buffer.append("'"+value+"'");
+						}
+					}
+				}
+			}
+			
+		}
+				
+		return buffer.toString();
+	}
+	
 	public String addSQL(Object entity){
 		entityFillField(entity);
 		
@@ -297,7 +402,6 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 			else
 				sql += ",";
 
-			sql += field.getFieldName()+"=";
 			Object fieldValue = field.getFieldValue();
 			
 			if(field.getFieldType()==Types.TIMESTAMP){
@@ -305,7 +409,7 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 			}else if(field.getFieldType()==Types.DATE){
 				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
 			} else {
-				sql += StringUtils.sqlValue(fieldValue);
+				sql += StringUtils.fieldValue(fieldValue);
 			}
 			
 		}
@@ -332,7 +436,7 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 			if(!field.isPrimaryKey() ){
 				if(isHead) {
 					isHead = false;
-					sql += " SET (";
+					sql += " SET ";
 				}else{
 					sql += ",";
 				}
@@ -346,13 +450,11 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 				}else if(field.getFieldType()==Types.DATE){
 					sql += "date'"+dformat.format(((Date)fieldValue))+"'";
 				} else {
-					sql += StringUtils.sqlValue(fieldValue);
+					sql += StringUtils.fieldValue(fieldValue);
 				}
 
 			}
 		}
-		
-		sql += ")";
 		
 		isHead = true;
 		for(Field field:entityField){
@@ -412,34 +514,13 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 			}else if(field.getFieldType()==Types.DATE){
 				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
 			} else {
-				sql += StringUtils.sqlValue(fieldValue);
+				sql += StringUtils.fieldValue(fieldValue);
 			}
 			
 		}
 		
 		//fill extend field
-		for(Field field:extendField){
-			
-			if(isHead) {
-				isHead = false;
-				sql += " WHERE ";
-			}else{
-				sql += field.getWhereBy();
-			}
-			
-			sql += field.getFieldName()+field.getWhereRule();
-			
-			Object fieldValue = field.getFieldValue();
-			
-			if(field.getFieldType()==Types.TIMESTAMP){
-				sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
-			}else if(field.getFieldType()==Types.DATE){
-				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
-			} else {
-				sql += StringUtils.sqlValue(fieldValue);
-			}
-			
-		}
+		sql += extendSQL();
 		
 		return sql;
 	}
@@ -472,33 +553,12 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 			}else if(field.getFieldType()==Types.DATE){
 				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
 			} else {
-				sql += StringUtils.sqlValue(fieldValue);
+				sql += StringUtils.fieldValue(fieldValue);
 			}
 		}
 		
 		//fill extend field
-		for(Field field:extendField){
-			
-			if(isHead) {
-				isHead = false;
-				sql += " WHERE ";
-			}else{
-				sql += field.getWhereBy();
-			}
-			
-			sql += field.getFieldName()+field.getWhereRule();
-			
-			Object fieldValue = field.getFieldValue();
-			
-			if(field.getFieldType()==Types.TIMESTAMP){
-				sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
-			}else if(field.getFieldType()==Types.DATE){
-				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
-			} else {
-				sql += StringUtils.sqlValue(fieldValue);
-			}
-			
-		}
+		sql += extendSQL();
 		
 		//make group by field
 		isHead = true;
@@ -541,9 +601,14 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 	}
 	
 	public String countSQL(Object entity){
-		String sql = searchSQL(entity);
+		String querySQL = searchSQL(entity);
+		int index = querySQL.indexOf(OFFSET_PAGE);
 		
-		return COUNT+" ("+sql.substring(0,sql.indexOf(OFFSET_PAGE)+1)+") result";
+		if(index>0){
+			querySQL=querySQL.substring(0,index+1);
+		}
+		
+		return COUNT+" ("+querySQL+") result";
 	}
 	
 	abstract public String offsetRecordSQL();

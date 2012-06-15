@@ -964,19 +964,19 @@ public class StringUtils {
 		}
 	}
 	
-	public static String sqlValue(Object entity) throws NullPointerException{
-		String sqlValue=null;
+	public static String fieldValue(Object entity) throws NullPointerException{
+		String fieldValue=null;
 		
 		if(entity.getClass().isAssignableFrom(Integer.class)
 				||entity.getClass().isAssignableFrom(Long.class)
 				||entity.getClass().isAssignableFrom(Float.class)
 				||entity.getClass().isAssignableFrom(Double.class)){
-			sqlValue = entity.toString();
+			fieldValue = entity.toString();
 		//}else if(entity.getClass().isAssignableFrom(String.class)){
 		}else {
-			sqlValue = "'"+entity.toString()+"'";
+			fieldValue = "'"+entity.toString()+"'";
 		}
 		
-		return sqlValue;
+		return fieldValue;
 	}
 }

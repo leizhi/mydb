@@ -302,27 +302,20 @@ public class DBObject implements DbProcess{
 	 */
 	public void retrieve(Connection connection) throws SQLException {
 		
-		String doSql = processSQL.countSQL(this);
-		
-		if(doSql==null || doSql.indexOf("WHERE") < 0){
-			return;
-		}
-		
-		int ls = doSql.indexOf("LIMIT");
-		if(ls>0)
-			doSql = doSql.substring(0,doSql.indexOf("LIMIT"));
-		
-		doSql += " LIMIT 1";
-	
-
-		
-		System.out.println("doSql:" + doSql);
-	
 		Connection myConn = null;
 		boolean isClose = true;
 	
 		Statement stmt = null;
-	
+		String executeSQL = processSQL.searchSQL(this);
+		
+		int index = executeSQL.indexOf("LIMIT");
+		if(index>0)
+			executeSQL = executeSQL.substring(0,executeSQL.indexOf("LIMIT"));
+		
+		executeSQL += " LIMIT 1";
+		
+		System.out.println("executeSQL:" + executeSQL);
+
 		try {
 			if(connection != null){
 				myConn = connection;
@@ -333,7 +326,7 @@ public class DBObject implements DbProcess{
 			}
 	
 			stmt = myConn.createStatement();
-			ResultSet result = stmt.executeQuery(doSql);
+			ResultSet result = stmt.executeQuery(executeSQL);
 	
 			ResultSetMetaData rsmd = result.getMetaData();
 			int type=0;

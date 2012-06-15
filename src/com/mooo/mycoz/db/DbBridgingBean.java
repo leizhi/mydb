@@ -286,7 +286,7 @@ public class DbBridgingBean {
 		System.out.println(sql);
 		buffer.append(StringUtils.prefixToUpperNot(table,prefix));
 		//buffer.append(" extends DBObject {\n");
-		buffer.append(" {\n");
+		buffer.append(" extends DBObject{\n");
 
 		System.out.println("beanName="+StringUtils.prefixToUpperNot(table,prefix));
 
