@@ -16,7 +16,7 @@ import com.mooo.mycoz.db.DbConfig;
 import com.mooo.mycoz.db.DbUtil;
 import com.mooo.mycoz.db.Field;
 
-public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
+public abstract class AbstractSQL implements ProcessSQL,Serializable{
 
 	/**
 	 * 
