@@ -314,11 +314,10 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		}
 	}
 	
-	private String extendSQL(){
+	private String extendSQL(boolean isHead){
 		StringBuffer buffer = new StringBuffer();
 
 		//fill extend field
-		boolean isHead = true;
 		for(Field field:extendField){
 			
 			Object fieldValue = field.getFieldValue();
@@ -379,9 +378,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 						if(field.getWhereRule().equals(Field.RULE_LIKE)){
 							buffer.append("'%"+value+"%'");
 						}else if(field.getWhereRule().equals(Field.RULE_IN)){
-							buffer.append(value);
+							buffer.append(" ("+value+") ");
 						}else{
-							buffer.append("'"+value+"'");
+							buffer.append(" '"+value+"' ");
 						}
 					}
 				}
@@ -392,11 +391,10 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		return buffer.toString();
 	}
 	
-	private String groupBy(){
+	private String groupBy(boolean isHead){
 		StringBuffer buffer = new StringBuffer();
 
 		//make group by field
-		boolean isHead = true;
 		for(Field field:groupField){
 			
 			if(field.isGroupBy()){
@@ -413,11 +411,10 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		return buffer.toString();
 	}
 	
-	private String orderBy(){
+	private String orderBy(boolean isHead){
 		StringBuffer buffer = new StringBuffer();
 
 		//make group by field
-		boolean isHead = true;
 		for(Field field:orderField){
 			
 			if(field.isOrderBy()){
@@ -585,7 +582,7 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		}
 		
 		//fill extend field
-		sql += extendSQL();
+		sql += extendSQL(isHead);
 		
 		return sql;
 	}
@@ -623,13 +620,13 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		}
 		
 		//fill extend field
-		sql += extendSQL();
+		sql += extendSQL(isHead);
 		
 		//make group by field
-		sql += groupBy();
+		sql += groupBy(isHead);
 		
 		//make order by field
-		sql += orderBy();
+		sql += orderBy(isHead);
 		
 		if(offsetRecord>-1 && maxRecords>0){
 			sql += OFFSET_PAGE+offsetRecord+","+maxRecords;
