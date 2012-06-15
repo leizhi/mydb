@@ -13,7 +13,7 @@ import java.util.Map;
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
-public class DbMultiBulildSQL implements MultiSQLProcess {
+public class MysqlMultiSQL implements ProcessMultiSQL {
 
 	public String catalog;
 	public Map<String,Class<?>> objs;
@@ -26,7 +26,7 @@ public class DbMultiBulildSQL implements MultiSQLProcess {
 	public int maxRecords;
 	
 	
-	public DbMultiBulildSQL() {
+	public MysqlMultiSQL() {
 		catalog = null;
 		objs = new HashMap<String,Class<?>>();
 		tables = new HashMap<String,String>();

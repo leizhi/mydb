@@ -1,7 +1,7 @@
 package com.mooo.mycoz.db.sql;
 
 
-public interface MultiSQLProcess {
+public interface ProcessMultiSQL {
  	
 	String getCatalog();
 

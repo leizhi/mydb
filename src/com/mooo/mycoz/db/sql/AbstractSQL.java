@@ -5,714 +5,223 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.mooo.mycoz.common.ReflectUtil;
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.DbConfig;
 import com.mooo.mycoz.db.DbUtil;
-import com.mooo.mycoz.db.ExtentField;
 import com.mooo.mycoz.db.Field;
 
-public abstract class AbstractSQL implements SQLProcess, Serializable{
-	
-	private static Log log = LogFactory.getLog(AbstractSQL.class);
-
-	private static SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 5695615314838758248L;
+	private static final long serialVersionUID = 7676596824913418468L;
+
+	public static final int DB_MYSQL=0;
+
+	public static final int DB_ORACLE=1;
 	
-	private String catalog;
-	private String table;
-
-	private boolean byWhere;
-	private boolean byGroup;
-	private boolean byOrder;
-	private boolean byLimit;
-
-	private StringBuilder whereBy;
-	private StringBuilder groupBy;
-	private StringBuilder orderBy;
-	private StringBuilder limitBy;
-
-	private boolean isSave;
-	private boolean isUpdate;
-	private boolean isSearch;
-
-	private StringBuilder saveKey;
-	private StringBuilder saveValue;
-	private StringBuilder saveSql;
+	public static final int DB_MSSQL=2;
 	
-	private StringBuilder updateSql;
-	private StringBuilder deleteSql;
-	private StringBuilder searchSql;
-//	private String countSql;
-
-	private Map<String, Field> fields;
-	private Map<String, Object> columnValues;
+	public static SimpleDateFormat dtformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private Map<String, ExtentField<?>> extentValues;
+	public static SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
+	
+	private static final String UPDATE="UPDATE ";
+	
+	private static final String ADD="INSERT INTO ";
+	
+	private static final String DELETE="DELETE FROM ";
 
+	private static final String SEARCH="SELECT * FROM ";
+	
+	private static final String COUNT="SELECT COUNT(*) FROM ";
+	
+	private static final String GROUP_BY=" GROUP BY ";
+	
+	private static final String ORDER_BY=" ORDER BY ";
+	
+	private static final String OFFSET_PAGE=" LIMIT ";
+	
 	private String prefix;
-	private boolean enableCase;
 
-	public String getCatalog() {
-		return catalog;
-	}
-
-	public void setCatalog(String catalog) {
-		this.catalog = catalog;
-	}
-
-	public String getTable() {
-		return table;
-	}
-
-	public void setTable(String table) {
-		this.table = table;
-	}
+	private String catalog;
 	
-	public boolean isByLimit() {
-		return byLimit;
-	}
-
-	public void setByLimit(boolean byLimit) {
-		this.byLimit = byLimit;
-	}
-
-	public StringBuilder getLimitBy() {
-		return limitBy;
-	}
-
-	public void setLimitBy(StringBuilder limitBy) {
-		this.limitBy = limitBy;
-	}
-
-	public Map<String, Object> getColumnValues() {
-		return columnValues;
-	}
-
-	public void setColumnValues(Map<String, Object> columnValues) {
-		this.columnValues = columnValues;
-	}
+	private int offsetRecord, maxRecords;
 	
-	public String getPrefix() {
-		return prefix;
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-
-	public boolean isEnableCase() {
-		return enableCase;
-	}
-
-	public void setEnableCase(boolean enableCase) {
-		this.enableCase = enableCase;
-	}
+	//Note: and,delete,update SQL not retrieve field
+	//		just any select SQL have retrieve field
 	
-	public void refresh(Object entity){
-		prefix = DbConfig.getProperty("Db.humpInterval");
-		
-		if(prefix !=null && prefix.equals("case")){
-			prefix = null;
-		}
-		
-		enableCase = DbConfig.getProperty("Db.case").equals("true");
-		
-//		if(StringUtils.isNull(catalog))
-		catalog = StringUtils.getCatalog(entity.getClass(),1);
-		
-		refresh(catalog,StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix));
-		
-		entityFillField(entity);
-	}
+	//Affect the field parameters for SQL
+	//Note: and,update are SQL affect field
+	//		delete,select are SQL not affect field
 	
-	public void refresh(String catalog,String table){
-		
-		this.catalog = catalog;
-		this.table = table;
-		
-		byWhere = false;
-		byGroup = false;
-		byOrder = false;
-		byLimit = false;
-
-		whereBy = new StringBuilder(" WHERE ");
-		groupBy = new StringBuilder(" GROUP BY ");
-		orderBy = new StringBuilder(" ORDER BY ");
-		
-		isSave = false;
-		isUpdate = false;
-		isSearch = true; // default search
-
-		saveKey = new StringBuilder("(");
-		saveValue = new StringBuilder(") VALUES(");
-
-		saveSql = new StringBuilder("INSERT INTO ");
-
-		updateSql = new StringBuilder("UPDATE ");
-		deleteSql = new StringBuilder("DELETE FROM ");
-		searchSql = new StringBuilder("SELECT * FROM ");
-
-		if(catalog != null) {
-			saveSql.append(catalog + ".");
-			updateSql.append(catalog + ".");
-			deleteSql.append(catalog + ".");
-			searchSql.append(catalog + ".");
-		}
-		
-		saveSql.append(table);
-		updateSql.append(table + " SET ");
-		deleteSql.append(table);
-		searchSql.append(table);
-
-		fields = new HashMap<String, Field>();
-		columnValues = new HashMap<String, Object>();
-		
-		extentValues = new HashMap<String, ExtentField<?>>();
-	}
+	//Filter the field parameters for SQL
+	//Note: and SQL not filter field
+	//		update,delete,select have filter field
 	
-	public void refreshSQL(){
-		whereBy = new StringBuilder(" WHERE ");
-		groupBy = new StringBuilder(" GROUP BY ");
-		orderBy = new StringBuilder(" ORDER BY ");
+	
+	private List<Field> entityField;
+	
+	private List<Field> extendField;
+	
+	private String table;
+	
+	public AbstractSQL(){
+		entityField = new ArrayList<Field>();
+		extendField = new ArrayList<Field>();
 		
-		saveKey = new StringBuilder("(");
-		saveValue = new StringBuilder(") VALUES(");
+		offsetRecord=-1;
+		maxRecords=-1;
+	}
 
-		saveSql = new StringBuilder("INSERT INTO ");
-
-		updateSql = new StringBuilder("UPDATE ");
-		deleteSql = new StringBuilder("DELETE FROM ");
-		searchSql = new StringBuilder("SELECT * FROM ");
-
-		if(catalog != null) {
-			saveSql.append(catalog + ".");
-			updateSql.append(catalog + ".");
-			deleteSql.append(catalog + ".");
-			searchSql.append(catalog + ".");
-		}
+	private void setWhereFor(String fieldName,Object fieldValue,int fieldType,String whereBy,String whereRule,boolean isPrimaryKey){
+		boolean haveField = false;
 		
-		saveSql.append(table);
-		updateSql.append(table + " SET ");
-		deleteSql.append(table);
-		searchSql.append(table);
-	}
-	
-	//setField
-	public void setField(String field, String value) {
-		try {
-			if (field == null || value == null)
-				new Exception("set value is null");
+		for(Field field:entityField){
 
-			fields.put(field, new Field(field,Types.VARCHAR));
-			columnValues.put(field, value);
-		} catch (Exception e) {
-		}
-	}
-
-	public void setField(String field, Integer value) {
-		try {
-			if (field == null || value == null)
-				new Exception("set value is null");
-
-			fields.put(field, new Field(field,Types.INTEGER));
-			columnValues.put(field, value);
-		} catch (Exception e) {
-		}
-	}
-
-	public void setField(String field, Double value) {
-		try {
-			if (field == null || value == null)
-				new Exception("set value is null");
-
-			fields.put(field, new Field(field,Types.DOUBLE));
-			columnValues.put(field, value);
-		} catch (Exception e) {
-		}
-	}
-
-	public void setField(String field, Date value,Integer columnType) {
-		try {
-			if (field == null || value == null)
-				throw new Exception("set value is null");
-
-			fields.put(field, new Field(field,columnType));
-			columnValues.put(field, value);
-			
-		} catch (Exception e) {
-		}
-	}
-	
-	public void setLike(String field) {
-		if (fields!=null && fields.containsKey(field)) {
-			Field likeField = (Field) fields.get(field);
-			
-			likeField.setWhereByLike(true);
-			likeField.setWhereByEqual(false);
-			likeField.setWhereByGreaterEqual(false);
-			likeField.setWhereByLessEqual(false);
-		}
-	}
-	
-	public void setGreaterEqual(String field) {
-		if (fields!=null && fields.containsKey(field)) {
-			Field geField = (Field) fields.get(field);
-			geField.setWhereByLike(false);
-			geField.setWhereByEqual(false);
-			geField.setWhereByGreaterEqual(true);
-			geField.setWhereByLessEqual(false);
-		}
-	}
-	
-	public void setLessEqual(String field) {
-		if (fields!=null && fields.containsKey(field)) {
-			Field leField = (Field) fields.get(field);
-			leField.setWhereByLike(false);
-			leField.setWhereByEqual(false);
-			leField.setWhereByGreaterEqual(false);
-			leField.setWhereByLessEqual(true);
-		}
-	}
-
-	public void setExtent(String field,Date start,Date end) {
-		if (extentValues != null) {
-			extentValues.put(field, new ExtentField<Date>(start,end));
-			
-			if (fields.containsKey(field)) {
-				Field leField = (Field) fields.get(field);
-				leField.setWhereByLike(false);
-				leField.setWhereByEqual(false);
-				leField.setWhereByGreaterEqual(false);
-				leField.setWhereByLessEqual(false);
-			}
-		}
-	}
-	
-	public void setExtent(String field,Integer start,Integer end) {
-		if (extentValues != null) {
-			extentValues.put(field, new ExtentField<Integer>(start,end));
-			
-			if (fields.containsKey(field)) {
-				Field leField = (Field) fields.get(field);
-				leField.setWhereByLike(false);
-				leField.setWhereByEqual(false);
-				leField.setWhereByGreaterEqual(false);
-				leField.setWhereByLessEqual(false);
-			}
-		}
-	}
-	
-	public void setExtent(String field,String start,String end) {
-		if (extentValues != null) {
-			extentValues.put(field, new ExtentField<String>(start,end));
-			
-			if (fields.containsKey(field)) {
-				Field leField = (Field) fields.get(field);
-				leField.setWhereByLike(false);
-				leField.setWhereByEqual(false);
-				leField.setWhereByGreaterEqual(false);
-				leField.setWhereByLessEqual(false);
-			}
-		}
-	}
-	
-	@Override
-	public void addGroupBy(String groupField) {
-		groupBy.append(groupField+",");
-		byGroup = true;
-	}
-	
-	@Override
-	public void addOrderBy(String orderField) {
-		orderBy.append(orderField+",");
-		byOrder = true;
-	}
-	
-	abstract public String selfDateSQL(Date date);
-
-	public String addSQL(Object entity) {
-		refresh(entity);
-		
-		if(fields == null || columnValues == null)
-			return null;
-		
-		Field field;
-		String key;
-		
-		for (Iterator<?> it = fields.keySet().iterator(); it.hasNext();) {
-			key = (String) it.next();
-			field = (Field) fields.get(key);
-			
-			Object obj = columnValues.get(key);
-
-			if(field.isSave()) {
-				isSave = true;
-				saveKey.append(field.getName()+",");
+			if(fieldName.equals(field.getFieldName())
+					&& field.getWhereRule().equals(Field.RULE_EQUAL)){
+				haveField=true;
 				
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					saveValue.append(obj+",");
-				}else if(obj.getClass().isAssignableFrom(String.class)){
-					saveValue.append("'"+obj+"',");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					if(field.getType()==Types.TIMESTAMP){
-						saveValue.append("date'"+dformat.format(((Date)obj)) +"',");
-					} else {
-						saveValue.append(selfDateSQL((Date)obj));
-					}
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					saveValue.append(obj+",");
-				}
+				field.setFieldValue(fieldValue);
+				field.setFieldType(fieldType);
+				field.setWhereBy(whereBy);
+				field.setWhereRule(whereRule);
+				field.setPrimaryKey(isPrimaryKey);
 			}
-			//if(log.isDebugEnabled())log.debug(field.getName()+"="+value);
 		}
 		
-		if(isSave){
-			saveKey.deleteCharAt(saveKey.lastIndexOf(","));
-			saveValue.deleteCharAt(saveValue.lastIndexOf(","));
-			saveValue.append(")");
-			
-			saveSql.append(saveKey);
-			saveSql.append(saveValue);
-		}
-
-		if(log.isDebugEnabled())log.debug("saveSql="+saveSql);
-
-		return saveSql.toString();
+		if(!haveField)
+			entityField.add(new Field(fieldName,fieldValue,fieldType,whereBy,whereRule,isPrimaryKey));
 	}
-
-	public String deleteSQL(Object entity) {
-		if(fields == null || columnValues == null)
-			return null;
-		
-		Field field;
-		String key;
-		
-		for (Iterator<?> it = fields.keySet().iterator(); it.hasNext();) {
-			key = (String) it.next();
-			field = (Field) fields.get(key);
-			
-			Object obj = columnValues.get(key);
-
-			if(field.isWhereByEqual()) {
-				byWhere = true;
-				
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					whereBy.append(field.getName()+" = "+obj +" AND ");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					whereBy.append(field.getName()+" = date'"+dformat.format(((Date)obj)) +"' AND ");
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					whereBy.append(field.getName()+" = "+obj +" AND ");
-				} else {
-					whereBy.append(field.getName()+" = '"+obj +"' AND ");
-				}
-			}
-			
-			if(field.isWhereByGreaterEqual()) {
-				byWhere = true;
-				
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					whereBy.append(field.getName()+" >= "+obj +" AND ");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					whereBy.append(field.getName()+" >= date'"+dformat.format(((Date)obj)) +"' AND ");
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					whereBy.append(field.getName()+" >= "+obj +" AND ");
-				} else {
-					whereBy.append(field.getName()+" >= '"+obj +"' AND ");
-				}
-			}
-
-			if(field.isWhereByLessEqual()) {
-				byWhere = true;
-
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					whereBy.append(field.getName()+" <= "+obj +" AND ");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					whereBy.append(field.getName()+" <= date'"+dformat.format(((Date)obj)) +"' AND ");
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					whereBy.append(field.getName()+" <= "+obj +" AND ");
-				} else {
-					whereBy.append(field.getName()+" <= '"+obj +"' AND ");
-				}
-			}
 	
-			if(log.isDebugEnabled())log.debug("whereBy="+whereBy);
+	public void setField(String fieldName,Object fieldValue,int fieldType,boolean isPrimaryKey){
+		setWhereFor(fieldName,fieldValue,fieldType,Field.WHERE_BY_AND,Field.RULE_EQUAL,isPrimaryKey);
+	}
+	
+	
+	public void setLike(String fieldName,Object fieldValue){
+		boolean haveField = false;
+		
+		for(Field field:entityField){
+			if(fieldName.equals(field.getFieldName())
+					&& field.getWhereRule().equals(Field.RULE_LIKE)){
+				haveField=true;
+				
+				field.setFieldValue(fieldValue);
+//				field.setFieldType(1000);
+//				field.setWhereBy(Field.WHERE_BY_AND);
+//				field.setWhereRule(Field.RULE_LIKE);
+//				field.setPrimaryKey(false);
+			}
 		}
 		
-		if(byWhere)
-			whereBy.delete(whereBy.lastIndexOf("AND"),whereBy.lastIndexOf("AND")+3);
-
-		if(byWhere)
-			deleteSql.append(whereBy);
-		
-		if(log.isDebugEnabled())log.debug("deleteSql="+deleteSql);
-
-		return deleteSql.toString();
+		if(!haveField)
+			extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_LIKE,false));
 	}
-
-	public String updateSQL(Object entity) {
-		refresh(entity);
+	
+	public void setGreaterEqual(String fieldName,Object fieldValue){
+		boolean haveField = false;
 		
-		if(fields == null || columnValues == null)
-			return null;
-		
-		Field field;
-		String key;
-		
-		for (Iterator<?> it = fields.keySet().iterator(); it.hasNext();) {
-			key = (String) it.next();
-			field = (Field) fields.get(key);
-			
-			Object obj = columnValues.get(key);
-		
-			if(field.isUpdate()) {
-				isUpdate = true;
-				if (DbUtil.isPrimaryKey(this.catalog, this.getTable(),field.getName())) {
-					byWhere = true;
-					
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						whereBy.append(field.getName()+" = "+obj +" AND ");
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-						whereBy.append(field.getName()+" = date'"+dformat.format(((Date)obj)) +"' AND ");
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						whereBy.append(field.getName()+" = "+obj +" AND ");
-					} else {
-						whereBy.append(field.getName()+" = '"+obj +"' AND ");
-					}
-					
-					continue;
-				}
-
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					updateSql.append(field.getName()+" = "+obj +",");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					updateSql.append(field.getName()+" = date'"+dformat.format(((Date)obj)) +"',");
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					updateSql.append(field.getName()+" = "+obj +",");
-				} else {
-					updateSql.append(field.getName()+" = '"+obj +"',");
-				}
+		for(Field field:entityField){
+			if(fieldName.equals(field.getFieldName())
+					&& field.getWhereRule().equals(Field.RULE_GREATER_EQUAL)){
+				haveField=true;
+				
+				field.setFieldValue(fieldValue);
 			}
-		}// build end
-		
-		if(byWhere)
-			whereBy.delete(whereBy.lastIndexOf("AND"),whereBy.lastIndexOf("AND")+3);
-			
-		if(isUpdate){
-			updateSql.deleteCharAt(updateSql.lastIndexOf(","));
-			
-			if(byWhere)
-				updateSql.append(whereBy);
 		}
-
-		if(log.isDebugEnabled())log.debug("updateSql="+updateSql);
-
-		return updateSql.toString();
-	}
-//////////////search default mysql
-	public String searchSQL(Object entity) {
 		
-		if(fields == null || columnValues == null)
-			return null;
-
-		try {	
-			Field field;
+		if(!haveField)
+			extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_GREATER_EQUAL,false));
+	}
 	
-			Object obj;
-			
-			for(String eKey: extentValues.keySet()){
-				byWhere = true;
-
-				ExtentField<?> extentField = extentValues.get(eKey);
-				obj = extentField.getStart();
-
-				if(obj.getClass().isAssignableFrom(Integer.class)){
-					whereBy.append(eKey+" >= "+extentField.getStart() +" AND ");
-					whereBy.append(eKey+" <= "+extentField.getEnd() +" AND ");
-				}else if(obj.getClass().isAssignableFrom(Date.class)){
-					whereBy.append(eKey+" >= date'"+dformat.format(extentField.getStart()) +"' AND ");
-					whereBy.append(eKey+" <= date'"+dformat.format(extentField.getEnd()) +"' AND ");
-				}else if(obj.getClass().isAssignableFrom(Double.class)){
-					whereBy.append(eKey+" >= "+extentField.getStart() +" AND ");
-					whereBy.append(eKey+" <= "+extentField.getEnd() +" AND ");
-				} else {
-					whereBy.append(eKey+" >= '"+extentField.getStart() +"' AND ");
-					whereBy.append(eKey+" <= '"+extentField.getEnd() +"' AND ");
-				}
+	public void setLessEqual(String fieldName,Object fieldValue){
+		boolean haveField = false;
+		
+		for(Field field:entityField){
+			if(fieldName.equals(field.getFieldName())
+					&& field.getWhereRule().equals(Field.RULE_LESS_EQUAL)){
+				haveField=true;
+				
+				field.setFieldValue(fieldValue);
 			}
-			
-			for (String key:fields.keySet()) {
-
-				field = (Field) fields.get(key);
-				obj = columnValues.get(key);
+		}
+		
+		if(!haveField)
+			extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_LESS_EQUAL,false));
+		
+	}
+	
+	public void setWhereIn(String fieldName,Object fieldValue){
+		boolean haveField = false;
+		
+		for(Field field:entityField){
+			if(fieldName.equals(field.getFieldName())
+					&& field.getWhereRule().equals(Field.RULE_IN)){
+				haveField=true;
 				
-				if(field.isWhereByEqual() && obj!=null) {
-					
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						Integer value = (Integer)obj;
-						if(value!=null && value!=0){
-							byWhere = true;
-							whereBy.append(field.getName()+" = "+value +" AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						Double value = (Double)obj;
-						if(value!=null && value!=0){
-							byWhere = true;
-							whereBy.append(field.getName()+" = "+value +" AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-							byWhere = true;
-							whereBy.append(field.getName()+" = date'"+dformat.format(((Date)obj)) +"' AND ");
-					}else if(obj.getClass().isAssignableFrom(String.class)){
-						String value = (String)obj;
-						if(value!=null && !value.equals("")){
-							byWhere = true;
-							whereBy.append(field.getName()+" = '"+value +"' AND ");
-						}
-					}
-				}
-				
-				if(field.isWhereByGreaterEqual() && obj!=null) {
-					
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						Integer value = (Integer)obj;
-						if(value!=null && value!=0){
-							byWhere = true;
-							whereBy.append(field.getName()+" >= "+value +" AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						Double value = (Double)obj;
-						if(value!=null && value!=0){
-							byWhere = true;
-							whereBy.append(field.getName()+" >= "+value +" AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-							byWhere = true;
-							whereBy.append(field.getName()+" >= date'"+dformat.format(((Date)obj)) +"' AND ");
-					} else {
-						String value = (String)obj;
-						if(value!=null && !value.equals("")){
-							byWhere = true;
-							whereBy.append(field.getName()+" >= '"+value +"' AND ");
-						}
-					}
-				}
-	
-				if(field.isWhereByLessEqual() && obj!=null) {
-	
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						Integer value = (Integer)obj;
-						if(value!=null && value!=0){
-							byWhere = true;
-							whereBy.append(field.getName()+" <= "+value +" AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						Double value = (Double)obj;
-						if(value!=null && value!=0){
-							byWhere = true;
-							whereBy.append(field.getName()+" <= "+value +" AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-						byWhere = true;
-						whereBy.append(field.getName()+" <= date'"+dformat.format(((Date)obj)) +"' AND ");
-					} else {
-						String value = (String)obj;
-						if(value!=null && !value.equals("")){
-							byWhere = true;
-							whereBy.append(field.getName()+" <= '"+value +"' AND ");
-						}
-					}
-				}
-	
-				if(field.isWhereByLike() && obj!=null) {
-	
-					if(obj.getClass().isAssignableFrom(Integer.class)){
-						Integer value = (Integer)obj;
-						if(value!=null && value!=0){
-							byWhere = true;
-							whereBy.append(field.getName()+" LIKE "+value +" AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Double.class)){
-						Double value = (Double)obj;
-						if(value!=null && value!=0){
-							byWhere = true;
-							whereBy.append(field.getName()+" LIKE "+value +" AND ");
-						}
-					}else if(obj.getClass().isAssignableFrom(Date.class)){
-						byWhere = true;
-						whereBy.append(field.getName()+" LIKE date'"+dformat.format(((Date)obj)) +"' AND ");
-					} else {
-						String value = (String)obj;
-						if(value!=null && !value.equals("")){
-							byWhere = true;
-							whereBy.append(field.getName()+" LIKE '%"+value +"%' AND ");
-						}
-					}
-				}
+				field.setFieldValue(fieldValue);
 			}
-			
-			if(byWhere)
-				whereBy.delete(whereBy.lastIndexOf("AND"),whereBy.lastIndexOf("AND")+3);
-			
-			if(byGroup)
-				groupBy.deleteCharAt(groupBy.lastIndexOf(","));
-			
-			if(byOrder)
-				orderBy.deleteCharAt(orderBy.lastIndexOf(","));
-			
-			if(isSearch){
-				if(searchSql.lastIndexOf(",") > 0)
-					searchSql.deleteCharAt(searchSql.lastIndexOf(","));
-				
-				if(byWhere) {
-					searchSql.append(whereBy);
-				}
-				
-				if(byGroup) {
-					searchSql.append(groupBy);
-				}
-				
-				if(byOrder) {
-					searchSql.append(orderBy);
-				}
-				
-				if(byLimit)
-					searchSql.append(limitBy);
-			}
-			
-			if(log.isDebugEnabled())log.debug("searchSql="+searchSql);
+		}
+		
+		if(!haveField)
+			extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_IN,false));
+	}
 	
-			return searchSql.toString();
-		} finally {
-			refreshSQL();
+	public void addGroupBy(String fieldName){
+		for(Field field:entityField){
+			if(fieldName.equals(field.getFieldName())){
+				field.setGroupBy(true);
+				break;
+			}
 		}
 	}
 	
-	public String countSQL(Object entity) {
-		return "SELECT COUNT(*) FROM ("+searchSQL(entity)+") result";
+	public void addOrderBy(String fieldName){
+		for(Field field:entityField){
+			if(fieldName.equals(field.getFieldName())){
+				field.setOrderBy(true);
+				break;
+			}
+		}
+	}
+	
+	public void setRecord(int offsetRecord, int maxRecords) {
+		this.offsetRecord=offsetRecord;
+		this.maxRecords=maxRecords;
 	}
 	
 	public void entityFillField(Object entity) {
 		try {
+			
+			prefix = DbConfig.getProperty("Db.humpInterval");
+			
+			if(prefix !=null && prefix.equals("case")){
+				prefix = null;
+			}
+			
+//			enableCase = DbConfig.getProperty("Db.case").equals("true");
+			
+			catalog = StringUtils.getCatalog(entity.getClass(),1);
+			table = StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix);
+
 			List<String> methods = ReflectUtil.getMethodNames(entity.getClass());
 			
 			String method;
 			String field;
+			
 			int columnType = 0;
-
+			String columnName = null;
+			boolean isPrimaryKey = false;
+			
 			for (Iterator<String> it = methods.iterator(); it.hasNext();) {
 				method = it.next();
 				if(method.indexOf("get")==0){
@@ -720,24 +229,22 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 					Method getMethod;
 					getMethod = entity.getClass().getMethod(method);
 					
-					Object obj = getMethod.invoke(entity);
+					Object columnValue = getMethod.invoke(entity);
 					
-					if(obj !=null) {
+					if(columnValue !=null) {
 						field = method.substring(method.indexOf("get")+3);
-						columnType = DbUtil.type(null,getCatalog(),getTable(),StringUtils.upperToPrefixNot(field,prefix));
 						
-						if(obj.getClass().isAssignableFrom(Integer.class))
-							setField(StringUtils.upperToPrefixNot(field,prefix), (Integer)obj);
-						else if(obj.getClass().isAssignableFrom(String.class)){
-							setField(StringUtils.upperToPrefixNot(field,prefix), (String)obj);
-						}else if(obj.getClass().isAssignableFrom(Date.class)){
-							if(columnType == Types.TIMESTAMP){
-								setField(StringUtils.upperToPrefixNot(field,prefix), (Date)obj,Types.TIMESTAMP);
-							} else{
-								setField(StringUtils.upperToPrefixNot(field,prefix), (Date)obj,columnType);
-							}
-						}else if(obj.getClass().isAssignableFrom(Double.class)){
-							setField(StringUtils.upperToPrefixNot(field,prefix), (Double)obj);
+						columnName = StringUtils.upperToPrefixNot(field,prefix);
+						
+						columnType = DbUtil.type(catalog,table,columnName);
+						
+						if(columnType>0){
+							isPrimaryKey = DbUtil.isPrimaryKey(catalog, table,columnName);
+							
+							setField(columnName,columnValue,columnType,isPrimaryKey);
+							
+//							System.out.println(columnName+" "+catalog+" "+table+" "+
+//							columnValue+" "+columnType+" "+isPrimaryKey);
 						}
 					}
 				}
@@ -756,4 +263,307 @@ public abstract class AbstractSQL implements SQLProcess, Serializable{
 			e.printStackTrace();
 		}
 	}
+	
+	public String addSQL(Object entity){
+		entityFillField(entity);
+		
+		String sql = ADD;
+		
+		sql += " "+catalog+".";
+		
+		sql += table;
+		
+		sql += " (";
+		
+		boolean isHead = true;
+		for(Field field:entityField){
+
+			if(isHead) 
+				isHead = false;
+			else
+				sql += ",";
+			
+			sql += field.getFieldName();
+			
+		}
+		
+		sql += ") VALUES(";
+		
+		isHead = true;
+		for(Field field:entityField){
+
+			if(isHead) 
+				isHead = false;
+			else
+				sql += ",";
+
+			sql += field.getFieldName()+"=";
+			Object fieldValue = field.getFieldValue();
+			
+			if(field.getFieldType()==Types.TIMESTAMP){
+				sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
+			}else if(field.getFieldType()==Types.DATE){
+				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
+			} else {
+				sql += StringUtils.sqlValue(fieldValue);
+			}
+			
+		}
+		
+		sql += ")"; 
+		
+		return sql;
+	}
+	
+	public String updateSQL(Object entity){
+		entityFillField(entity);
+		
+		String sql = UPDATE;
+		
+		sql += " "+catalog+".";
+		
+		sql += table;
+		
+		Object fieldValue;
+		boolean isHead = true;
+
+		for(Field field:entityField){
+
+			if(!field.isPrimaryKey() ){
+				if(isHead) {
+					isHead = false;
+					sql += " SET (";
+				}else{
+					sql += ",";
+				}
+				
+				fieldValue = field.getFieldValue();
+				
+				sql += field.getFieldName()+"=";
+
+				if(field.getFieldType()==Types.TIMESTAMP){
+					sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
+				}else if(field.getFieldType()==Types.DATE){
+					sql += "date'"+dformat.format(((Date)fieldValue))+"'";
+				} else {
+					sql += StringUtils.sqlValue(fieldValue);
+				}
+
+			}
+		}
+		
+		sql += ")";
+		
+		isHead = true;
+		for(Field field:entityField){
+			
+			if(field.isPrimaryKey() ){
+				if(isHead) {
+					isHead = false;
+					sql += " WHERE ";
+				}else{
+					sql += field.getWhereBy();
+				}
+				
+				fieldValue = field.getFieldValue();
+				
+				sql += field.getFieldName()+"=";
+
+				if(field.getFieldType()==Types.TIMESTAMP){
+					sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
+				}else if(field.getFieldType()==Types.DATE){
+					sql += "date'"+dformat.format(((Date)fieldValue))+"'";
+				} else {
+					sql += fieldValue.toString();
+				}
+				
+			}
+		}
+		
+		return sql;
+	}
+	
+	public String deleteSQL(Object entity){
+		entityFillField(entity);
+		
+		String sql = DELETE;
+		
+		sql += catalog+".";
+		
+		sql += table;
+		
+		boolean isHead = true;
+		
+		for(Field field:entityField){
+			
+			if(isHead) {
+				isHead = false;
+				sql += " WHERE ";
+			}else{
+				sql += field.getWhereBy();
+			}
+			
+			sql += field.getFieldName()+field.getWhereRule();
+			
+			Object fieldValue = field.getFieldValue();
+			
+			if(field.getFieldType()==Types.TIMESTAMP){
+				sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
+			}else if(field.getFieldType()==Types.DATE){
+				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
+			} else {
+				sql += StringUtils.sqlValue(fieldValue);
+			}
+			
+		}
+		
+		//fill extend field
+		for(Field field:extendField){
+			
+			if(isHead) {
+				isHead = false;
+				sql += " WHERE ";
+			}else{
+				sql += field.getWhereBy();
+			}
+			
+			sql += field.getFieldName()+field.getWhereRule();
+			
+			Object fieldValue = field.getFieldValue();
+			
+			if(field.getFieldType()==Types.TIMESTAMP){
+				sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
+			}else if(field.getFieldType()==Types.DATE){
+				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
+			} else {
+				sql += StringUtils.sqlValue(fieldValue);
+			}
+			
+		}
+		
+		return sql;
+	}
+	
+	public String searchSQL(Object entity){
+		entityFillField(entity);
+		
+		String sql = SEARCH;
+				
+		sql += catalog+".";
+		
+		sql += table;
+		
+		boolean isHead = true;
+		
+		for(Field field:entityField){
+			
+			if(isHead) {
+				isHead = false;
+				sql += " WHERE ";
+			}else{
+				sql += field.getWhereBy();
+			}
+			
+			sql += field.getFieldName()+"=";
+			Object fieldValue = field.getFieldValue();
+			
+			if(field.getFieldType()==Types.TIMESTAMP){
+				sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
+			}else if(field.getFieldType()==Types.DATE){
+				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
+			} else {
+				sql += StringUtils.sqlValue(fieldValue);
+			}
+		}
+		
+		//fill extend field
+		for(Field field:extendField){
+			
+			if(isHead) {
+				isHead = false;
+				sql += " WHERE ";
+			}else{
+				sql += field.getWhereBy();
+			}
+			
+			sql += field.getFieldName()+field.getWhereRule();
+			
+			Object fieldValue = field.getFieldValue();
+			
+			if(field.getFieldType()==Types.TIMESTAMP){
+				sql += "date'"+dtformat.format(((Date)fieldValue))+"'";
+			}else if(field.getFieldType()==Types.DATE){
+				sql += "date'"+dformat.format(((Date)fieldValue))+"'";
+			} else {
+				sql += StringUtils.sqlValue(fieldValue);
+			}
+			
+		}
+		
+		//make group by field
+		isHead = true;
+		for(Field field:entityField){
+			
+			if(field.isGroupBy()){
+				if(isHead) {
+					isHead = false;
+					sql += GROUP_BY;
+				}else{
+					sql += ",";
+				}
+				
+				sql += field.getFieldName();
+			}
+		}
+		
+		//make order by field
+		isHead = true;
+		for(Field field:entityField){
+			
+			if(field.isOrderBy()){
+				if(isHead) {
+					isHead = false;
+					sql += ORDER_BY;
+				}else{
+					sql += ",";
+				}
+				
+				sql += field.getFieldName();
+			}
+		}
+		
+		
+		if(offsetRecord>-1 && maxRecords>0){
+			sql += OFFSET_PAGE+offsetRecord+","+maxRecords;
+		}
+		
+		return sql;
+	}
+	
+	public String countSQL(Object entity){
+		String sql = searchSQL(entity);
+		
+		return COUNT+" ("+sql.substring(0,sql.indexOf(OFFSET_PAGE)+1)+") result";
+	}
+	
+	abstract public String offsetRecordSQL();
+	
+	abstract public String selfDateSQL(Date date);
+
+	public int getOffsetRecord() {
+		return offsetRecord;
+	}
+
+	public void setOffsetRecord(int offsetRecord) {
+		this.offsetRecord = offsetRecord;
+	}
+
+	public int getMaxRecords() {
+		return maxRecords;
+	}
+
+	public void setMaxRecords(int maxRecords) {
+		this.maxRecords = maxRecords;
+	}
+	
 }

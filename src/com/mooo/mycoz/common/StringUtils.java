@@ -963,4 +963,20 @@ public class StringUtils {
 			return str;
 		}
 	}
+	
+	public static String sqlValue(Object entity) throws NullPointerException{
+		String sqlValue=null;
+		
+		if(entity.getClass().isAssignableFrom(Integer.class)
+				||entity.getClass().isAssignableFrom(Long.class)
+				||entity.getClass().isAssignableFrom(Float.class)
+				||entity.getClass().isAssignableFrom(Double.class)){
+			sqlValue = entity.toString();
+		//}else if(entity.getClass().isAssignableFrom(String.class)){
+		}else {
+			sqlValue = "'"+entity.toString()+"'";
+		}
+		
+		return sqlValue;
+	}
 }

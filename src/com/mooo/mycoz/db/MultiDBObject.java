@@ -14,10 +14,10 @@ import java.util.Map.Entry;
 
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
-import com.mooo.mycoz.db.sql.DbMultiBulildSQL;
-import com.mooo.mycoz.db.sql.MultiSQLProcess;
+import com.mooo.mycoz.db.sql.MysqlMultiSQL;
+import com.mooo.mycoz.db.sql.ProcessMultiSQL;
 
-public class MultiDBObject extends DbMultiBulildSQL implements MultiSQLProcess{
+public class MultiDBObject extends MysqlMultiSQL implements ProcessMultiSQL{
 	
 	/**
 	 * 
@@ -71,7 +71,8 @@ public class MultiDBObject extends DbMultiBulildSQL implements MultiSQLProcess{
 					int type = DbUtil.type(myConn, catalog, table,StringUtils.upperToPrefix(column, null));
 
 					if(allRow.containsKey(StringUtils.toLowerFirst(table))){
-						Map<Object,Object> bean = (Map<Object,Object>) allRow.get(StringUtils.toLowerFirst(table));
+						Object obj = allRow.get(StringUtils.toLowerFirst(table));
+						Map<Object,Object> bean = (Map<Object, Object>) obj;
 						
 						if(type == Types.TIMESTAMP){
 							bean.put(rsmd.getColumnName(i), result.getTimestamp(i));

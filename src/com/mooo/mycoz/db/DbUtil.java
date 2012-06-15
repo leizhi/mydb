@@ -132,6 +132,10 @@ public class DbUtil {
 			}
 
 		}
-		return 0;
+		return -1;
+	}
+
+	public static int type(String catalog,String table,String column) {
+		return type(null,catalog,table,column);
 	}
 }
