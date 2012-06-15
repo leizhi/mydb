@@ -39,9 +39,12 @@ public class Field {
 	private boolean isOrderBy;
 	
 	public Field (String fieldName){
+		this.fieldName = fieldName;
+		this.fieldValue = null;
+		
 		this.fieldType = 0;
-		this.fieldName = fieldName;
 		this.fieldLength = 0;
+		
 		this.isNull = true;
 		this.isPrimaryKey = false;
 		this.isForeignKey = false;
@@ -54,13 +57,22 @@ public class Field {
 		this.isUpdate = true;
 		this.isDelete = true;
 		this.isRetrieve = true;
+		
 		this.whereBy=WHERE_BY_AND;
+		
+		this.whereBy = null;
+		this.whereRule = null;
+		
+		this.isGroupBy = false;
+		this.isOrderBy = false;
 	}
-	
-	public Field (String fieldName,int fieldType){
-		this.fieldType = fieldType;
+	public Field (String fieldName,boolean isGroupBy,boolean isOrderBy){
 		this.fieldName = fieldName;
+		this.fieldValue = null;
+		
+		this.fieldType = 0;
 		this.fieldLength = 0;
+		
 		this.isNull = true;
 		this.isPrimaryKey = false;
 		this.isForeignKey = false;
@@ -73,7 +85,14 @@ public class Field {
 		this.isUpdate = true;
 		this.isDelete = true;
 		this.isRetrieve = true;
+		
 		this.whereBy=WHERE_BY_AND;
+		
+		this.whereBy = null;
+		this.whereRule = null;
+		
+		this.isGroupBy = isGroupBy;
+		this.isOrderBy = isOrderBy;
 	}
 	
 	public Field (String fieldName,Object fieldValue,int fieldType,String whereBy,String whereRule,boolean isPrimaryKey){
@@ -98,45 +117,7 @@ public class Field {
 		this.whereBy=whereBy;
 		this.whereRule=whereRule;
 	}
-	
-	public Field (String fieldName,int fieldType,boolean isPrimaryKey){
-		this.fieldType = fieldType;
-		this.fieldName = fieldName;
-		this.fieldLength = 0;
-		this.isNull = true;
-		this.isPrimaryKey = isPrimaryKey;
-		this.isForeignKey = false;
-		this.isKey = false;
-		this.whereByEqual = true;
-		this.whereByLike = false;
-		this.whereByGreaterEqual = false;
-		this.whereByLessEqual = false;
-		this.isSave = true;
-		this.isUpdate = true;
-		this.isDelete = true;
-		this.isRetrieve = true;
-		this.whereBy=WHERE_BY_AND;
-	}
-	
-	public Field (String fieldName,int fieldType,boolean isPrimaryKey,String whereBy){
-		this.fieldType = fieldType;
-		this.fieldName = fieldName;
-		this.fieldLength = 0;
-		this.isNull = true;
-		this.isPrimaryKey = isPrimaryKey;
-		this.isForeignKey = false;
-		this.isKey = false;
-		this.whereByEqual = true;
-		this.whereByLike = false;
-		this.whereByGreaterEqual = false;
-		this.whereByLessEqual = false;
-		this.isSave = true;
-		this.isUpdate = true;
-		this.isDelete = true;
-		this.isRetrieve = true;
-		this.whereBy=whereBy;
-	}
-	
+	/*
 	public Field (int fieldType,String fieldName,int fieldLength,
 			boolean isNull,boolean isPrimaryKey,boolean isForeignKey,boolean isKey,
 			boolean whereByEqual,boolean whereByLike,boolean whereByGreaterEqual,boolean whereByLessEqual,
@@ -160,7 +141,7 @@ public class Field {
 		this.isRetrieve = isRetrieve;
 		this.whereBy=whereBy;
 	}
-
+*/
 	public String getFieldName() {
 		return fieldName;
 	}

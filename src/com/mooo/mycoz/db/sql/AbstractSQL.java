@@ -71,11 +71,18 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 	
 	private List<Field> extendField;
 	
+	private List<Field> groupField;
+
+	private List<Field> orderField;
+
 	private String table;
 	
 	public AbstractSQL(){
 		entityField = new ArrayList<Field>();
 		extendField = new ArrayList<Field>();
+		
+		groupField = new ArrayList<Field>();
+		orderField = new ArrayList<Field>();
 		
 		offsetRecord=-1;
 		maxRecords=-1;
@@ -206,20 +213,34 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 	}
 	
 	public void addGroupBy(String fieldName){
-		for(Field field:entityField){
-			if(fieldName.equals(field.getFieldName())){
-				field.setGroupBy(true);
-				break;
+		if(fieldName!=null){
+			boolean haveField = false;
+			for(Field field:groupField){
+				if(fieldName.equals(field.getFieldName())){
+					
+					haveField=true;
+					break;
+				}
 			}
+			
+			if(!haveField)
+				groupField.add(new Field(fieldName,true,false));
 		}
 	}
 	
 	public void addOrderBy(String fieldName){
-		for(Field field:entityField){
-			if(fieldName.equals(field.getFieldName())){
-				field.setOrderBy(true);
-				break;
+		if(fieldName!=null){
+			boolean haveField = false;
+			for(Field field:orderField){
+				if(fieldName.equals(field.getFieldName())){
+					
+					haveField=true;
+					break;
+				}
 			}
+			
+			if(!haveField)
+				orderField.add(new Field(fieldName,false,true));
 		}
 	}
 	
@@ -357,6 +378,8 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 
 						if(field.getWhereRule().equals(Field.RULE_LIKE)){
 							buffer.append("'%"+value+"%'");
+						}else if(field.getWhereRule().equals(Field.RULE_IN)){
+							buffer.append(value);
 						}else{
 							buffer.append("'"+value+"'");
 						}
@@ -366,6 +389,48 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 			
 		}
 				
+		return buffer.toString();
+	}
+	
+	private String groupBy(){
+		StringBuffer buffer = new StringBuffer();
+
+		//make group by field
+		boolean isHead = true;
+		for(Field field:groupField){
+			
+			if(field.isGroupBy()){
+				if(isHead) {
+					isHead = false;
+					buffer.append(GROUP_BY);
+				}else{
+					buffer.append(",");
+				}
+				
+				buffer.append(field.getFieldName());
+			}
+		}
+		return buffer.toString();
+	}
+	
+	private String orderBy(){
+		StringBuffer buffer = new StringBuffer();
+
+		//make group by field
+		boolean isHead = true;
+		for(Field field:orderField){
+			
+			if(field.isOrderBy()){
+				if(isHead) {
+					isHead = false;
+					buffer.append(ORDER_BY);
+				}else{
+					buffer.append(",");
+				}
+				
+				buffer.append(field.getFieldName());
+			}
+		}
 		return buffer.toString();
 	}
 	
@@ -561,37 +626,10 @@ public abstract class AbstractSQL implements SetupSQL,ProcessSQL,Serializable{
 		sql += extendSQL();
 		
 		//make group by field
-		isHead = true;
-		for(Field field:entityField){
-			
-			if(field.isGroupBy()){
-				if(isHead) {
-					isHead = false;
-					sql += GROUP_BY;
-				}else{
-					sql += ",";
-				}
-				
-				sql += field.getFieldName();
-			}
-		}
+		sql += groupBy();
 		
 		//make order by field
-		isHead = true;
-		for(Field field:entityField){
-			
-			if(field.isOrderBy()){
-				if(isHead) {
-					isHead = false;
-					sql += ORDER_BY;
-				}else{
-					sql += ",";
-				}
-				
-				sql += field.getFieldName();
-			}
-		}
-		
+		sql += orderBy();
 		
 		if(offsetRecord>-1 && maxRecords>0){
 			sql += OFFSET_PAGE+offsetRecord+","+maxRecords;
