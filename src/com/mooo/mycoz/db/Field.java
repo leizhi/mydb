@@ -11,6 +11,9 @@ public class Field {
 	public static final String RULE_LESS_EQUAL=" <= ";
 	public static final String RULE_IN=" IN ";
 	
+	private String catalog;
+	private String table;
+	
 	private String fieldName;
 	private Object fieldValue;
 	
@@ -300,6 +303,18 @@ public class Field {
 
 	public void setOrderBy(boolean isOrderBy) {
 		this.isOrderBy = isOrderBy;
+	}
+	public String getCatalog() {
+		return catalog;
+	}
+	public void setCatalog(String catalog) {
+		this.catalog = catalog;
+	}
+	public String getTable() {
+		return table;
+	}
+	public void setTable(String table) {
+		this.table = table;
 	}
 
 }

@@ -15,7 +15,6 @@ import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 public class MysqlMultiSQL implements ProcessMultiSQL {
 
-	public String catalog;
 	public Map<String,Class<?>> objs;
 	public Map<String,String> tables;
 	public List<String> whereKey;
@@ -25,9 +24,7 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 	public int offsetRecord;
 	public int maxRecords;
 	
-	
 	public MysqlMultiSQL() {
-		catalog = null;
 		objs = new HashMap<String,Class<?>>();
 		tables = new HashMap<String,String>();
 		whereKey = new ArrayList<String>();
@@ -39,7 +36,6 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 	}
 	
 	public void clear() {
-		catalog = null;
 		tables.clear();
 		whereKey.clear();
 		retrieveFields.clear();
@@ -50,17 +46,10 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 	}
 	public void addTable(Class<?> clazz, String alias) {
 		objs.put(alias, clazz);
-		
-		if (catalog != null)
-			tables.put(alias, catalog + "." + clazz.getSimpleName());
-		else
-			tables.put(alias, getDbName(clazz));
+		tables.put(alias, getDbName(clazz));
 	}
 	
 	public void addTable(String name, String alias) {
-		if (catalog != null)
-			tables.put(alias, catalog + "." + name);
-		else
 			tables.put(alias, name);
 	}
 
@@ -131,64 +120,84 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 		orderBy.add(alias + "." + field);
 	}
 
-	public String getCatalog() {
-		return catalog;
-	}
-
-	public void setCatalog(String catalog) {
-		this.catalog = catalog;
-	}
-
 	public String searchSQL() {
 		String key;
 		String value;
 		String sql = "";
 		
+		boolean isHead = true;
+		
 		if (retrieveFields != null && !retrieveFields.isEmpty()) {
 			sql += "SELECT ";
 			for (Iterator<String> it = retrieveFields.iterator(); it.hasNext();) {
 				value = it.next();
-				sql += value + ",";
-			}
-			sql = sql.substring(0, sql.lastIndexOf(","));
 
+				if(isHead) {
+					isHead = false;
+					sql += value;
+				}else{
+					sql += ","+value;
+				}
+			}
 		}
 
+		isHead = true;
 		if (tables != null && !tables.isEmpty()) {
 			sql += " FROM ";
 			for (Iterator<?> it = tables.keySet().iterator(); it.hasNext();) {
 				key = (String) it.next();
 				value = (String) tables.get(key);
-				sql += value +" "+key+ ",";
+				
+				if(isHead) {
+					isHead = false;
+					sql += value +" "+key;
+				}else{
+					sql +=  ","+value +" "+key;
+				}
+				
 			}
-			sql = sql.substring(0, sql.lastIndexOf(","));
 		}
 
+		isHead = true;
 		if (whereKey != null && !whereKey.isEmpty()) {
 			sql += " WHERE ";
 			for (Iterator<String> it = whereKey.iterator(); it.hasNext();) {
 				value = it.next();
-				sql += value + " AND ";
+				if(isHead) {
+					isHead = false;
+					sql += value;
+				}else{
+					sql += " AND "+value;
+				}
 			}
-			sql = sql.substring(0, sql.lastIndexOf(" AND "));
 		}
 
+		isHead = true;
 		if (groupBy != null && !groupBy.isEmpty()) {
 			sql += " GROUP BY ";
 			for (Iterator<String> it = groupBy.iterator(); it.hasNext();) {
 				value = it.next();
-				sql += value + ",";
+				if(isHead) {
+					isHead = false;
+					sql += value;
+				}else{
+					sql += ","+value;
+				}
 			}
-			sql = sql.substring(0, sql.lastIndexOf(","));
 		}
 
+		isHead = true;
 		if (orderBy != null && !orderBy.isEmpty()) {
 			sql += " ORDER BY ";
 			for (Iterator<String> it = orderBy.iterator(); it.hasNext();) {
 				value = it.next();
-				sql += value + ",";
+				if(isHead) {
+					isHead = false;
+					sql += value;
+				}else{
+					sql += ","+value;
+				}
 			}
-			sql = sql.substring(0, sql.lastIndexOf(","));
 		}
 
 		if (offsetRecord != 0 && maxRecords != 0) {
@@ -199,8 +208,6 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 
 		}
 
-		// clear();
-
 		return sql;
 	}
 
@@ -208,7 +215,14 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 		String searchSQL = searchSQL();
 
 		String sql = "SELECT COUNT(*) ";
-		searchSQL = searchSQL.substring(searchSQL.indexOf("FROM"));
+		int odex = searchSQL.indexOf("ORDER");
+		
+		if(odex<0){
+			searchSQL = searchSQL.substring(searchSQL.indexOf("FROM"));
+		}else{
+			searchSQL = searchSQL.substring(searchSQL.indexOf("FROM"),odex);
+		}
+		
 		sql += searchSQL;
 		return sql;
 	}

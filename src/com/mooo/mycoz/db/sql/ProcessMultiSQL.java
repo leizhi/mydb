@@ -3,10 +3,6 @@ package com.mooo.mycoz.db.sql;
 
 public interface ProcessMultiSQL {
  	
-	String getCatalog();
-
-	void setCatalog(String catalog);
-	
 	void addTable(String name, String alias);
 	
 	void addTable(String catalog, String name, String alias);
