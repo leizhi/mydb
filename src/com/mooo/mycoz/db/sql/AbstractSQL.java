@@ -316,7 +316,7 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 	
 	private String extendSQL(boolean isHead){
 		StringBuffer buffer = new StringBuffer();
-
+		
 		//fill extend field
 		for(Field field:extendField){
 			
@@ -391,8 +391,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		return buffer.toString();
 	}
 	
-	private String groupBy(boolean isHead){
+	private String groupBy(){
 		StringBuffer buffer = new StringBuffer();
+		boolean isHead = true;
 
 		//make group by field
 		for(Field field:groupField){
@@ -411,8 +412,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		return buffer.toString();
 	}
 	
-	private String orderBy(boolean isHead){
+	private String orderBy(){
 		StringBuffer buffer = new StringBuffer();
+		boolean isHead = true;
 
 		//make group by field
 		for(Field field:orderField){
@@ -623,10 +625,10 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		sql += extendSQL(isHead);
 		
 		//make group by field
-		sql += groupBy(isHead);
+		sql += groupBy();
 		
 		//make order by field
-		sql += orderBy(isHead);
+		sql += orderBy();
 		
 		if(offsetRecord>-1 && maxRecords>0){
 			sql += OFFSET_PAGE+offsetRecord+","+maxRecords;
