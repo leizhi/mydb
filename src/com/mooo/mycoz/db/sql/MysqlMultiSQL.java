@@ -224,6 +224,7 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 		}
 		
 		sql += searchSQL;
+		
 		return sql;
 	}
 
@@ -241,6 +242,8 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 
 		String doSql = buildCountSQL();
 		
+		System.out.println("countSQL->" + doSql);
+
 		Connection myConn = null;
 		Statement stmt = null;
 		boolean isClose = true;
