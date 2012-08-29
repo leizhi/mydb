@@ -41,8 +41,6 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 
 	private static final String SEARCH="SELECT * FROM ";
 	
-	private static final String COUNT="SELECT COUNT(*) FROM ";
-	
 	private static final String GROUP_BY=" GROUP BY ";
 	
 	private static final String ORDER_BY=" ORDER BY ";
@@ -639,13 +637,13 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 	
 	public String countSQL(Object entity){
 		String querySQL = searchSQL(entity);
-		int index = querySQL.indexOf(OFFSET_PAGE);
-		
-		if(index>0){
-			querySQL=querySQL.substring(0,index+1);
+
+		int vdex = querySQL.indexOf(OFFSET_PAGE);
+		if(vdex>0){
+			querySQL = querySQL.substring(0,vdex);
 		}
 		
-		return COUNT+" ("+querySQL+") result";
+		return querySQL;
 	}
 	
 	abstract public String offsetRecordSQL();

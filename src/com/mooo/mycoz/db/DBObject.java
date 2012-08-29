@@ -170,7 +170,7 @@ public class DBObject implements DbProcess{
 		
 		Statement stmt = null;
 		String executeSQL = processSQL.countSQL(this);
-		System.out.println("executeSQL:" + executeSQL);
+		System.out.println("countSQL:" + executeSQL);
 		try {
 			if(connection != null){
 				myConn = connection;
