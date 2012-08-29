@@ -32,6 +32,4 @@ public interface ProcessMultiSQL {
  	void setOrderBy(String alias, String field);
  	
  	void setRecord(int offset, int rowcount);
- 	
- 	int count();
 }

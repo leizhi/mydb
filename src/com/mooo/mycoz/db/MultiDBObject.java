@@ -15,9 +15,8 @@ import java.util.Map.Entry;
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 import com.mooo.mycoz.db.sql.MysqlMultiSQL;
-import com.mooo.mycoz.db.sql.ProcessMultiSQL;
 
-public class MultiDBObject extends MysqlMultiSQL implements ProcessMultiSQL{
+public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 	
 	/**
 	 * 
@@ -120,5 +119,66 @@ public class MultiDBObject extends MysqlMultiSQL implements ProcessMultiSQL{
 	 */
 	public List<Object> searchAndRetrieveList() throws SQLException{
 		return searchAndRetrieveList(null);
+	}
+	
+	public int count() {
+		return count(null);
+	}
+	
+	public int count(Connection connection) {
+		long startTime = System.currentTimeMillis();
+
+		String doSql = buildCountSQL();
+		
+		System.out.println("countSQL->" + doSql);
+
+		Connection myConn = null;
+		Statement stmt = null;
+		boolean isClose = true;
+
+		int total=0;
+
+		try {
+			if(connection != null){
+				myConn = connection;
+				isClose = false;
+			} else {
+				myConn = DbConnectionManager.getConnection();
+				isClose = true;
+			}
+			
+			stmt = myConn.createStatement();
+			ResultSet result = stmt.executeQuery(doSql);
+			
+			while (result.next()) {
+				total ++;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				if(isClose)
+					myConn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+		}
+		long finishTime = System.currentTimeMillis();
+		long hours = (finishTime - startTime) / 1000 / 60 / 60;
+		long minutes = (finishTime - startTime) / 1000 / 60 - hours * 60;
+		long seconds = (finishTime - startTime) / 1000 - hours * 60 * 60 - minutes * 60;
+		
+		System.out.println(finishTime - startTime);
+		System.out.println("count expends:   " + hours + ":" + minutes + ":" + seconds);
+		return total;
 	}
 }

@@ -1,9 +1,5 @@
 package com.mooo.mycoz.db.sql;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.mooo.mycoz.common.StringUtils;
-import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 public class MysqlMultiSQL implements ProcessMultiSQL {
 
@@ -214,18 +209,12 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 	public String buildCountSQL() {
 		String searchSQL = searchSQL();
 
-		String sql = "SELECT COUNT(*) ";
-		int odex = searchSQL.indexOf("ORDER");
-		
-		if(odex<0){
-			searchSQL = searchSQL.substring(searchSQL.indexOf("FROM"));
-		}else{
-			searchSQL = searchSQL.substring(searchSQL.indexOf("FROM"),odex);
+		int vdex = searchSQL.indexOf("LIMIT");
+		if(vdex>0){
+			searchSQL = searchSQL.substring(0,vdex);
 		}
 		
-		sql += searchSQL;
-		
-		return sql;
+		return searchSQL;
 	}
 
 	public void setRecord(int offsetRecord, int maxRecords) {
@@ -233,67 +222,6 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 		this.maxRecords = maxRecords;
 	}
 
-	public int count() {
-		return count(null);
-	}
-	
-	public int count(Connection connection) {
-		long startTime = System.currentTimeMillis();
-
-		String doSql = buildCountSQL();
-		
-		System.out.println("countSQL->" + doSql);
-
-		Connection myConn = null;
-		Statement stmt = null;
-		boolean isClose = true;
-
-		int total=0;
-
-		try {
-			if(connection != null){
-				myConn = connection;
-				isClose = false;
-			} else {
-				myConn = DbConnectionManager.getConnection();
-				isClose = true;
-			}
-			
-			stmt = myConn.createStatement();
-			ResultSet result = stmt.executeQuery(doSql);
-			
-			while (result.next()) {
-				total = result.getInt(1);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				if(isClose)
-					myConn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-		}
-		long finishTime = System.currentTimeMillis();
-		long hours = (finishTime - startTime) / 1000 / 60 / 60;
-		long minutes = (finishTime - startTime) / 1000 / 60 - hours * 60;
-		long seconds = (finishTime - startTime) / 1000 - hours * 60 * 60 - minutes * 60;
-		
-		System.out.println(finishTime - startTime);
-		System.out.println("count expends:   " + hours + ":" + minutes + ":" + seconds);
-		return total;
-	}
-	
 	public String getDbName(Class<?> clazz){
 		
 		String value ="";
