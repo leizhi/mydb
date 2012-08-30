@@ -108,7 +108,7 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 	}
 
 	public void setOrderBy(String alias, String field, String type) {
-		orderBy.add(field + " " + type);
+		orderBy.add(alias + "." + field + " " + type);
 	}
 
 	public void setOrderBy(String alias, String field) {
