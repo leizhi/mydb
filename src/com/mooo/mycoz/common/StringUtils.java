@@ -979,4 +979,13 @@ public class StringUtils {
 		
 		return fieldValue;
 	}
+	
+	public static int length(String buffer){
+		
+		if(buffer==null || buffer.equals("")){
+			return 0;
+		}
+		
+		return buffer.getBytes().length;
+	}
 }
