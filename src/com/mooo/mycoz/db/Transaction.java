@@ -15,7 +15,7 @@ public class Transaction {
 	//private boolean abortTransaction;
 	private boolean supportsTransactions;
 
-	public void start() {
+	public synchronized void start() {
 		try {
 				connection = DbConnectionManager.getConnection();
 				supportsTransactions = connection.getMetaData().supportsTransactions();
@@ -42,7 +42,7 @@ public class Transaction {
 		return connection;
 	}
 
-	public void rollback() {
+	public synchronized void rollback() {
 		try {
 			if (supportsTransactions) {
 				if (connection != null)
@@ -58,7 +58,7 @@ public class Transaction {
 		}
 	}
 
-	public void commit() {
+	public synchronized void commit() {
 		try {
 			if (supportsTransactions) {
 				if (connection != null)
@@ -74,7 +74,7 @@ public class Transaction {
 		}
 	}
 
-	public void end() {
+	public synchronized void end() {
 		try {
 			if (supportsTransactions) {
 					connection.setAutoCommit(true);

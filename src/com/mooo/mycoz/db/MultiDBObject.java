@@ -21,7 +21,7 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 	/**
 	 * 
 	 */
-	public List<Object> searchAndRetrieveList(Connection connection) throws SQLException{
+	public synchronized List<Object> searchAndRetrieveList(Connection connection) throws SQLException{
 		long startTime = System.currentTimeMillis();
 
 		List<Object> retrieveList = null;
@@ -125,7 +125,7 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 		return count(null);
 	}
 	
-	public int count(Connection connection) {
+	public synchronized int count(Connection connection) {
 		long startTime = System.currentTimeMillis();
 
 		String doSql = buildCountSQL();

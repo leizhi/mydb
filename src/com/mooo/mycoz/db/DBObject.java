@@ -29,7 +29,7 @@ public class DBObject implements DbProcess{
 	/**
 	 * add
 	 */ 
-	public void add(Connection connection) throws SQLException {
+	public synchronized void add(Connection connection) throws SQLException {
 		Connection myConn = null;
 		boolean isClose = true;
 		
@@ -74,7 +74,7 @@ public class DBObject implements DbProcess{
 	/**
 	 * update
 	 */ 
-	public void update(Connection connection) throws SQLException {
+	public synchronized void update(Connection connection) throws SQLException {
 		
 		Connection myConn = null;
 		boolean isClose = true;
@@ -118,7 +118,7 @@ public class DBObject implements DbProcess{
 	 * delete
 	 */ 
 	
-	public void delete(Connection connection) throws SQLException {
+	public synchronized void delete(Connection connection) throws SQLException {
 		
 		Connection myConn = null;
 		boolean isClose = true;
@@ -162,7 +162,7 @@ public class DBObject implements DbProcess{
 	/**
 	 * count
 	 */
-	public int count(Connection connection) throws SQLException {
+	public synchronized int count(Connection connection) throws SQLException {
 		int total=0;
 
 		Connection myConn = null;
@@ -214,7 +214,7 @@ public class DBObject implements DbProcess{
 	/**
 	 * searchAndRetrieveList
 	 */
-	public List<Object>  searchAndRetrieveList(Connection connection)
+	public synchronized List<Object>  searchAndRetrieveList(Connection connection)
 			throws SQLException {
 		
 		List<Object> retrieveList = null;
@@ -301,7 +301,7 @@ public class DBObject implements DbProcess{
 	/**
 	 * retrieve
 	 */
-	public void retrieve(Connection connection) throws SQLException {
+	public synchronized void retrieve(Connection connection) throws SQLException {
 		
 		Connection myConn = null;
 		boolean isClose = true;
