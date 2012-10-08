@@ -2,6 +2,8 @@ package com.mooo.mycoz.db.sql;
 
 import java.util.Date;
 
+import com.mooo.mycoz.common.CalendarUtils;
+
 public class MysqlSQL extends AbstractSQL {
 
 	/**
@@ -14,7 +16,7 @@ public class MysqlSQL extends AbstractSQL {
 	}
 
 	public String selfDateSQL(Date date) {
-		return "date'"+dformat.format(date) +"',";
+		return "date'"+CalendarUtils.dformat(date) +"',";
 	}
 
 }
