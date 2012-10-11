@@ -68,11 +68,17 @@ public class CalendarUtils {
 	
 	private static SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
 	
+	private static SimpleDateFormat dformat2 = new SimpleDateFormat("yyMMdd");
+
 	public static String dtformat(Date date){
 		return dtformat.format(date);
 	}
 	
 	public static String dformat(Date date){
 		return dformat.format(date);
+	}
+	
+	public static String dformat2(Date date){
+		return dformat2.format(date);
 	}
 }
