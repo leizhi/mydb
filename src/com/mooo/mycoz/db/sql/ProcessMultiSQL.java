@@ -23,6 +23,8 @@ public interface ProcessMultiSQL {
 	
  	void setNotEqual(String alias, String field, String value);
  	
+ 	void setNotEqual(String alias, String field, int value);
+ 	
  	void addCustomWhereClause(String value);
  	
  	void setGroupBy(String alias, String field);

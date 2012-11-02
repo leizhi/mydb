@@ -56,6 +56,7 @@
  */
 package com.mooo.mycoz.common;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -73,12 +74,22 @@ public class CalendarUtils {
 	public static String dtformat(Date date){
 		return dtformat.format(date);
 	}
+	public static Date dtparse(String dateValue) throws ParseException{
+		return dtformat.parse(dateValue);
+	}
 	
 	public static String dformat(Date date){
 		return dformat.format(date);
 	}
+	public static Date dparse(String dateValue) throws ParseException{
+		return dformat.parse(dateValue);
+	}
 	
 	public static String dformat2(Date date){
 		return dformat2.format(date);
+	}
+	
+	public static Date dparse2(String dateValue) throws ParseException{
+		return dformat2.parse(dateValue);
 	}
 }

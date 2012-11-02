@@ -99,6 +99,10 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 		whereKey.add(alias + "." + field + " <> '" + value + "'");
 	}
 
+	public void setNotEqual(String alias, String field, int value) {
+		whereKey.add(alias + "." + field + " <> " + value);
+	}
+	
 	public void addCustomWhereClause(String value) {
 		whereKey.add(value);
 	}
