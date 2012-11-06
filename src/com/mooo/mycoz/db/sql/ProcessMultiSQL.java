@@ -17,13 +17,17 @@ public interface ProcessMultiSQL {
 	
 	void setLike(String alias, String field, String value);
 	
+	void setGreaterEqual(String alias, String field, int value);
+
 	void setGreaterEqual(String alias, String field, String value);
 	
+	void setLessEqual(String alias, String field, int value);
+
 	void setLessEqual(String alias, String field, String value);
 	
- 	void setNotEqual(String alias, String field, String value);
- 	
  	void setNotEqual(String alias, String field, int value);
+
+ 	void setNotEqual(String alias, String field, String value);
  	
  	void addCustomWhereClause(String value);
  	
