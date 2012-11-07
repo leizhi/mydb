@@ -17,9 +17,17 @@ public interface ProcessMultiSQL {
 	
 	void setLike(String alias, String field, String value);
 	
+	void setGreater(String alias, String field, int value);
+
+	void setGreater(String alias, String field, String value);
+	
 	void setGreaterEqual(String alias, String field, int value);
 
 	void setGreaterEqual(String alias, String field, String value);
+	
+	void setLess(String alias, String field, int value);
+
+	void setLess(String alias, String field, String value);
 	
 	void setLessEqual(String alias, String field, int value);
 

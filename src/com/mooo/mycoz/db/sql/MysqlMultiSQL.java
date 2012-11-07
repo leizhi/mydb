@@ -87,6 +87,14 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 		}
 	}
 
+	public void setGreater(String alias, String field, int value) {
+		whereKey.add(alias + "." + field + " > " + value);
+	}
+	
+	public void setGreater(String alias, String field, String value) {
+		whereKey.add(alias + "." + field + " > '" + value + "'");
+	}
+	
 	public void setGreaterEqual(String alias, String field, int value) {
 		whereKey.add(alias + "." + field + " >= " + value);
 	}
@@ -94,7 +102,15 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 	public void setGreaterEqual(String alias, String field, String value) {
 		whereKey.add(alias + "." + field + " >= '" + value + "'");
 	}
-
+	
+	public void setLess(String alias, String field, int value) {
+		whereKey.add(alias + "." + field + " < " + value);
+	}
+	
+	public void setLess(String alias, String field, String value) {
+		whereKey.add(alias + "." + field + " < '" + value + "'");
+	}
+	
 	public void setLessEqual(String alias, String field, int value) {
 		whereKey.add(alias + "." + field + " <= " + value);
 	}
