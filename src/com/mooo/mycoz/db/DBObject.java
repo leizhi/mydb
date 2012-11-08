@@ -381,14 +381,26 @@ public class DBObject implements DbProcess{
 		processSQL.setLike(fieldName, fieldValue);
 	}
 
+	public void setGreater(String fieldName, Object fieldValue) {
+		processSQL.setGreater(fieldName, fieldValue);
+	}
+	
 	public void setGreaterEqual(String fieldName, Object fieldValue) {
 		processSQL.setGreaterEqual(fieldName, fieldValue);
 	}
 
+	public void setLess(String fieldName, Object fieldValue) {
+		processSQL.setLess(fieldName, fieldValue);
+	}
+	
 	public void setLessEqual(String fieldName, Object fieldValue) {
 		processSQL.setLessEqual(fieldName, fieldValue);
 	}
 
+	public void setNotEqual(String fieldName, Object fieldValue) {
+		processSQL.setNotEqual(fieldName, fieldValue);
+	}
+	
 	public void setWhereIn(String fieldName, Object fieldValue) {
 		processSQL.setWhereIn(fieldName, fieldValue);
 	}

@@ -7,8 +7,11 @@ public class Field {
 	
 	public static final String RULE_EQUAL=" = ";
 	public static final String RULE_LIKE=" LIKE ";
+	public static final String RULE_GREATER=" > ";
 	public static final String RULE_GREATER_EQUAL=" >= ";
+	public static final String RULE_LESS=" < ";
 	public static final String RULE_LESS_EQUAL=" <= ";
+	public static final String RULE_NOT_EQUAL=" <> ";
 	public static final String RULE_IN=" IN ";
 	
 	private String catalog;

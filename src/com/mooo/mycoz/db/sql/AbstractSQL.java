@@ -147,6 +147,24 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 			}
 		}
 	}
+	public void setGreater(String fieldName,Object fieldValue){
+		if(fieldName!=null && fieldValue!=null){
+			boolean haveField = false;
+			for(Field field:entityField){
+				if(fieldName.equals(field.getFieldName())
+						&& field.getWhereRule().equals(Field.RULE_GREATER)){
+					
+					field.setFieldValue(fieldValue);
+					
+					haveField=true;
+					break;
+				}
+			}
+			
+			if(!haveField)
+				extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_GREATER,false));
+		}
+	}
 	
 	public void setGreaterEqual(String fieldName,Object fieldValue){
 		if(fieldName!=null && fieldValue!=null){
@@ -165,6 +183,26 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 			if(!haveField)
 				extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_GREATER_EQUAL,false));
 		}
+	}
+	
+	public void setLess(String fieldName,Object fieldValue){
+		if(fieldName!=null && fieldValue!=null){
+			boolean haveField = false;
+			for(Field field:entityField){
+				if(fieldName.equals(field.getFieldName())
+						&& field.getWhereRule().equals(Field.RULE_LESS)){
+					
+					field.setFieldValue(fieldValue);
+					
+					haveField=true;
+					break;
+				}
+			}
+			
+			if(!haveField)
+				extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_LESS,false));
+		}
+		
 	}
 	
 	public void setLessEqual(String fieldName,Object fieldValue){
@@ -187,6 +225,25 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		
 	}
 	
+	public void setNotEqual(String fieldName,Object fieldValue){
+		if(fieldName!=null && fieldValue!=null){
+			boolean haveField = false;
+			for(Field field:entityField){
+				if(fieldName.equals(field.getFieldName())
+						&& field.getWhereRule().equals(Field.RULE_NOT_EQUAL)){
+					
+					field.setFieldValue(fieldValue);
+					
+					haveField=true;
+					break;
+				}
+			}
+			
+			if(!haveField)
+				extendField.add(new Field(fieldName,fieldValue,1000,Field.WHERE_BY_AND,Field.RULE_NOT_EQUAL,false));
+		}
+		
+	}
 	public void setWhereIn(String fieldName,Object fieldValue){
 		if(fieldName!=null && fieldValue!=null){
 			boolean haveField = false;

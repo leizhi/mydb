@@ -6,10 +6,16 @@ public interface SetupSQL {
 	
 	public void setLike(String fieldName,Object fieldValue);
 	
+	public void setGreater(String fieldName,Object fieldValue);
+
 	public void setGreaterEqual(String fieldName,Object fieldValue);
 	
+	public void setLess(String fieldName,Object fieldValue);
+
 	public void setLessEqual(String fieldName,Object fieldValue);
 	
+	public void setNotEqual(String fieldName,Object fieldValue);
+
 	public void setWhereIn(String fieldName,Object fieldValue);
 	
 	public void addGroupBy(String fieldName);
@@ -17,5 +23,4 @@ public interface SetupSQL {
 	public void addOrderBy(String fieldName);
 	
 	public void setRecord(int offsetRecord, int maxRecords);
-	
 }
