@@ -67,6 +67,8 @@ public class CalendarUtils {
 
 	private static SimpleDateFormat dtformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
+	private static SimpleDateFormat dtformat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
 	private static SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
 	
 	private static SimpleDateFormat dformat2 = new SimpleDateFormat("yyMMdd");
@@ -78,9 +80,17 @@ public class CalendarUtils {
 		return dtformat.parse(dateValue);
 	}
 	
+	public static String dtformat2(Date date){
+		return dtformat2.format(date);
+	}
+	public static Date dtparse2(String dateValue) throws ParseException{
+		return dtformat2.parse(dateValue);
+	}
+	
 	public static String dformat(Date date){
 		return dformat.format(date);
 	}
+	
 	public static Date dparse(String dateValue) throws ParseException{
 		return dformat.parse(dateValue);
 	}
