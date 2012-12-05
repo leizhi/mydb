@@ -12,7 +12,6 @@ public class Transaction {
 	private static Log log = LogFactory.getLog(Transaction.class);
 
 	private Connection connection;
-	//private boolean abortTransaction;
 	private boolean supportsTransactions;
 
 	public synchronized void start() {
