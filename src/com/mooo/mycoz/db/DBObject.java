@@ -259,14 +259,26 @@ public class DBObject implements DbProcess{
 						DbBridgingBean.bindProperty(bean,
 								StringUtils.formatHump(rsmd.getColumnName(i),null),
 								result.getDate(i));	
+					}else if(type == Types.SMALLINT){
+						DbBridgingBean.bindProperty(bean,
+								StringUtils.formatHump(rsmd.getColumnName(i),null),
+								result.getShort(i));
+						System.out.println(rsmd.getColumnName(i)+"\tTypes.SMALLINT:" + Types.SMALLINT);
+					}else if(type == Types.INTEGER){
+						DbBridgingBean.bindProperty(bean,
+								StringUtils.formatHump(rsmd.getColumnName(i),null),
+								result.getInt(i));
+						System.out.println(rsmd.getColumnName(i)+"\tTypes.INTEGER:" + Types.INTEGER);
 					}else if(type == Types.BIGINT){
 						DbBridgingBean.bindProperty(bean,
 								StringUtils.formatHump(rsmd.getColumnName(i),null),
-								result.getLong(i));	
+								result.getLong(i));
+						System.out.println(rsmd.getColumnName(i)+"\tTypes.BIGINTT:" + Types.BIGINT);
 					}else{
 						DbBridgingBean.bindProperty(bean,
 								StringUtils.formatHump(rsmd.getColumnName(i),null),
-								result.getString(i));	
+								result.getString(i));
+						System.out.println(rsmd.getColumnName(i)+"\tTypes.OTHER:" + type);
 					}
 
 				}

@@ -17,7 +17,7 @@ import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 public class DbBridgingBean {
-	//private static Log log = LogFactory.getLog(BeanUtil.class);
+
 	private String prefix;
 
 	/**
@@ -84,6 +84,60 @@ public class DbBridgingBean {
 	}
 
 	public static void bindProperty(Object bean, String propertyName,
+			Short value) throws NoSuchMethodException,
+			InvocationTargetException, IllegalAccessException, ParseException,
+			InstantiationException {
+
+		// 得到方法名
+		String funName = StringUtils.getFunName(propertyName);
+		// get方法
+		Method getMethod = bean.getClass().getMethod("get" + funName);
+		// 得到参数类型
+		Class<?> cl = getMethod.getReturnType();
+		// set方法
+		Method setMethod = bean.getClass().getMethod("set" + funName,
+				new Class[] { cl });
+
+		// 当参数为空时直接赋予NULL值
+		if (value == null || value==0) {
+			setMethod.invoke(bean, new Object[] { null });
+			return;
+		}
+
+		// 根据不同的系统对象转换
+		if (cl == Short.class ) {
+			setMethod.invoke(bean, new Object[] { value });
+		} 
+	}
+	
+	public static void bindProperty(Object bean, String propertyName,
+			Integer value) throws NoSuchMethodException,
+			InvocationTargetException, IllegalAccessException, ParseException,
+			InstantiationException {
+
+		// 得到方法名
+		String funName = StringUtils.getFunName(propertyName);
+		// get方法
+		Method getMethod = bean.getClass().getMethod("get" + funName);
+		// 得到参数类型
+		Class<?> cl = getMethod.getReturnType();
+		// set方法
+		Method setMethod = bean.getClass().getMethod("set" + funName,
+				new Class[] { cl });
+
+		// 当参数为空时直接赋予NULL值
+		if (value == null || value==0) {
+			setMethod.invoke(bean, new Object[] { null });
+			return;
+		}
+
+		// 根据不同的系统对象转换
+		if (cl == Integer.class ) {
+			setMethod.invoke(bean, new Object[] { value });
+		} 
+	}
+	
+	public static void bindProperty(Object bean, String propertyName,
 			Long value) throws NoSuchMethodException,
 			InvocationTargetException, IllegalAccessException, ParseException,
 			InstantiationException {
@@ -105,19 +159,8 @@ public class DbBridgingBean {
 		}
 
 		// 根据不同的系统对象转换
-		if (cl == String.class) {
+		if (cl == Long.class) {
 			setMethod.invoke(bean, new Object[] { value });
-			return;
-		} else if (cl == Integer.class || cl == Float.class || cl == Long.class
-				|| cl == Double.class || cl == Byte.class
-				|| cl == Boolean.class || cl == Character.class) {
-			Method valueOf = cl.getMethod("valueOf",new Class[] { String.class });
-			
-			Object valueObj = valueOf.invoke(cl, new Object[] { value });
-			setMethod.invoke(bean, new Object[] { valueObj });
-		} else if (cl == java.util.Date.class || cl == java.sql.Date.class) {
-			Object bindDate = new Date(new Long(value));
-			setMethod.invoke(bean, new Object[] { bindDate });
 		}
 	}
 	
@@ -321,6 +364,9 @@ public class DbBridgingBean {
 					buffer.append("\tprivate Double "+ columnName + ";\n");
 					gsMethod.append(StringUtils.createMethod(columnName, "Double"));
 				}
+			}else if (type == Types.SMALLINT){
+				buffer.append("\tprivate Short "+ columnName + ";\n");
+				gsMethod.append(StringUtils.createMethod(columnName, "Short"));
 			}else if (type == Types.INTEGER){
 				buffer.append("\tprivate Integer "+ columnName + ";\n");
 				gsMethod.append(StringUtils.createMethod(columnName, "Integer"));
