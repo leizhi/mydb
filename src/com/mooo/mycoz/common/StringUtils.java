@@ -967,7 +967,8 @@ public class StringUtils {
 	public static String fieldValue(Object entity) throws NullPointerException{
 		String fieldValue=null;
 		
-		if(entity.getClass().isAssignableFrom(Integer.class)
+		if(entity.getClass().isAssignableFrom(Short.class)
+				||entity.getClass().isAssignableFrom(Integer.class)
 				||entity.getClass().isAssignableFrom(Long.class)
 				||entity.getClass().isAssignableFrom(Float.class)
 				||entity.getClass().isAssignableFrom(Double.class)){
