@@ -536,8 +536,6 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 		boolean isHead = true;
 
 		for(Field field:entityField){
-
-			if(!field.isPrimaryKey() ){
 				if(isHead) {
 					isHead = false;
 					sql += " SET ";
@@ -556,8 +554,6 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 				} else {
 					sql += StringUtils.fieldValue(fieldValue);
 				}
-
-			}
 		}
 		
 		isHead = true;
