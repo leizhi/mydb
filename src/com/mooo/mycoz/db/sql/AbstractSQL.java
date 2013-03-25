@@ -537,7 +537,7 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 
 		for(Field field:entityField){
 			
-			if(field.isPrimaryKey() ){
+			if(!field.isPrimaryKey() ){
 
 				if(isHead) {
 					isHead = false;
