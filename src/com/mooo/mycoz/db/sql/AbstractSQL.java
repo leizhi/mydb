@@ -337,11 +337,11 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 						columnName = StringUtils.upperToPrefixNot(field,prefix);
 						
 						columnType = DbUtil.type(catalog,table,columnName);
-						
+						if(columnType!=-100){
 //						System.out.println(columnName+" "+catalog+" "+table+" "+ columnValue+" "+columnType+" "+isPrimaryKey);
-
-						isPrimaryKey = DbUtil.isPrimaryKey(catalog, table,columnName);
-						setField(columnName,columnValue,columnType,isPrimaryKey);
+							isPrimaryKey = DbUtil.isPrimaryKey(catalog, table,columnName);
+							setField(columnName,columnValue,columnType,isPrimaryKey);
+						}
 					}
 				}
 			}

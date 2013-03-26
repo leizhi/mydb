@@ -71,6 +71,8 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 
 					int type = DbUtil.type(myConn,catalog,table,StringUtils.upperToPrefix(column,null));
 					
+					if (type==-100) continue;
+					
 					if(allRow.containsKey(StringUtils.toLowerFirst(table))){
 						Object bean = allRow.get(StringUtils.toLowerFirst(table));
 						

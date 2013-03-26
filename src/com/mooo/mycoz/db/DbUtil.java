@@ -99,7 +99,7 @@ public class DbUtil {
 		return retrieveList;
 
 	}
-	
+
 	public static int type(Connection connection,String catalog,String table,String column) {
 		
 		Connection myConn = null;
@@ -132,7 +132,7 @@ public class DbUtil {
 			}
 
 		}
-		return -1;
+		return -100;
 	}
 
 	public static int type(String catalog,String table,String column) {
