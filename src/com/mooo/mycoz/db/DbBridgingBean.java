@@ -353,7 +353,7 @@ public class DbBridgingBean {
 
 			System.out.println(columnName+" Precision: "+ precision+" Scale: "+scale);
 
-			if(type == Types.VARCHAR || type == Types.LONGVARCHAR || type == Types.CHAR || type ==Types.LONGNVARCHAR){
+			if(type == Types.CHAR || type == Types.VARCHAR || type == Types.LONGVARCHAR || type ==Types.NVARCHAR || type==Types.OTHER){
 				buffer.append("\tprivate String "+ columnName + ";\n");
 				gsMethod.append(StringUtils.createMethod(columnName, "String"));
 			}else if (type==Types.NUMERIC){
