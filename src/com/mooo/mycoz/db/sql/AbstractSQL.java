@@ -338,14 +338,10 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 						
 						columnType = DbUtil.type(catalog,table,columnName);
 						
-						if(columnType>0){
-							isPrimaryKey = DbUtil.isPrimaryKey(catalog, table,columnName);
-							
-							setField(columnName,columnValue,columnType,isPrimaryKey);
-							
-//							System.out.println(columnName+" "+catalog+" "+table+" "+
-//							columnValue+" "+columnType+" "+isPrimaryKey);
-						}
+//						System.out.println(columnName+" "+catalog+" "+table+" "+ columnValue+" "+columnType+" "+isPrimaryKey);
+
+						isPrimaryKey = DbUtil.isPrimaryKey(catalog, table,columnName);
+						setField(columnName,columnValue,columnType,isPrimaryKey);
 					}
 				}
 			}

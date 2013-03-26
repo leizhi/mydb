@@ -70,6 +70,7 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 					column = rsmd.getColumnName(i);
 
 					int type = DbUtil.type(myConn,catalog,table,StringUtils.upperToPrefix(column,null));
+					
 					if(allRow.containsKey(StringUtils.toLowerFirst(table))){
 						Object bean = allRow.get(StringUtils.toLowerFirst(table));
 						
