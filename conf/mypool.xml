@@ -47,4 +47,8 @@
 <entry key="DbConnectionDefaultPool.maxConnections">25</entry>
 <entry key="Sequence.UseDatabase">false</entry>
 <entry key="connectionProvider.className">com.mooo.mycoz.db.pool.DbConnectionDefaultPool</entry>
+
+<entry key="com.mooo.mycoz.dbobj.wineFrameWork">wineFrameWork</entry>
+<entry key="com.mooo.mycoz.dbobj.wineBranch">wineBranch</entry>
+<entry key="com.mooo.mycoz.dbobj.wineShared">wineShared</entry>
 </properties>

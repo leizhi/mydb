@@ -916,7 +916,7 @@ public class StringUtils {
 		}
 		return funName;
 	}
-	
+	/*
 	public static String getCatalog(Class<?> cls,int begin) {
 
 		String value=null;
@@ -943,7 +943,7 @@ public class StringUtils {
 		
 		return null;
 	}
-	
+	*/
 	public static void noNull(String str) throws NullPointerException{
 		if(str == null || str.equals("")){
 			throw new NullPointerException("cant no null");

@@ -310,7 +310,7 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 			
 //			enableCase = DbConfig.getProperty("Db.case").equals("true");
 			
-			catalog = StringUtils.getCatalog(entity.getClass(),1);
+			catalog = DbConfig.getProperty(entity.getClass().getName());
 			table = StringUtils.upperToPrefix(entity.getClass().getSimpleName(),prefix);
 
 			List<String> methods = ReflectUtil.getMethodNames(entity.getClass());
