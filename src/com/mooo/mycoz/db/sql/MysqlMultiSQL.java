@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mooo.mycoz.common.StringUtils;
+import com.mooo.mycoz.db.DbConfig;
 
 public class MysqlMultiSQL implements ProcessMultiSQL {
 
@@ -41,7 +42,7 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 	}
 	public void addTable(Class<?> clazz, String alias) {
 		objs.put(alias, clazz);
-		tables.put(alias, getDbName(clazz));
+		tables.put(alias, DbConfig.getProperty(clazz.getPackage().getName()));
 	}
 	
 	public void addTable(String name, String alias) {
@@ -249,18 +250,4 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 		this.offsetRecord = offsetRecord;
 		this.maxRecords = maxRecords;
 	}
-
-	public String getDbName(Class<?> clazz){
-		
-		String value ="";
-		String fillName = clazz.getName();
-		String[] packArray=fillName.split("\\.");
-
-		for(int i=packArray.length-2;i<packArray.length;i++)
-			value += packArray[i]+".";
-		value = value.substring(0, value.length()-1);
-		
-		return value;
-	}
-
 }
