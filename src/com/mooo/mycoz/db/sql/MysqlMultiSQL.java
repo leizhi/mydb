@@ -42,7 +42,7 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 	}
 	public void addTable(Class<?> clazz, String alias) {
 		objs.put(alias, clazz);
-		tables.put(alias, DbConfig.getProperty(clazz.getPackage().getName()));
+		tables.put(alias, DbConfig.getProperty(clazz.getPackage().getName())+"."+clazz.getSimpleName());
 	}
 	
 	public void addTable(String name, String alias) {
