@@ -351,7 +351,7 @@ public class DbBridgingBean {
 			columnName = rsmd.getColumnName(i + 1);
 			columnName = StringUtils.prefixToUpperNot(columnName,prefix);
 
-			System.out.println(columnName+" Precision: "+ precision+" Scale: "+scale);
+			System.out.println(columnName+" Precision: "+ precision+" Scale: "+scale+" columnType: "+ type);
 
 			if(type == Types.CHAR || type == Types.VARCHAR || type == Types.LONGVARCHAR || type ==Types.NVARCHAR || type==Types.OTHER){
 				buffer.append("\tprivate String "+ columnName + ";\n");
