@@ -505,15 +505,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 			Object fieldValue = field.getFieldValue();
 			
 			if(field.getFieldType()==Types.TIMESTAMP){
-<<<<<<< HEAD
 				sql += "'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
 			}else if(field.getFieldType()==Types.DATE){
 				sql += "'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
-=======
-				sql += "date('"+CalendarUtils.dtformat(((Date)fieldValue))+"')";
-			}else if(field.getFieldType()==Types.DATE){
-				sql += "date('"+CalendarUtils.dformat(((Date)fieldValue))+"')";
->>>>>>> 7fcbdf3d9875fb001668377373b44e647ea0f289
 			} else {
 				sql += StringUtils.fieldValue(fieldValue);
 			}
@@ -553,15 +547,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 				sql += field.getFieldName()+"=";
 
 				if(field.getFieldType()==Types.TIMESTAMP){
-<<<<<<< HEAD
 					sql += "'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
 				}else if(field.getFieldType()==Types.DATE){
 					sql += "'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
-=======
-					sql += "date('"+CalendarUtils.dtformat(((Date)fieldValue))+"')";
-				}else if(field.getFieldType()==Types.DATE){
-					sql += "date('"+CalendarUtils.dformat(((Date)fieldValue))+"')";
->>>>>>> 7fcbdf3d9875fb001668377373b44e647ea0f289
 				} else {
 					sql += StringUtils.fieldValue(fieldValue);
 				}
