@@ -505,9 +505,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 			Object fieldValue = field.getFieldValue();
 			
 			if(field.getFieldType()==Types.TIMESTAMP){
-				sql += "date'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
+				sql += "'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
 			}else if(field.getFieldType()==Types.DATE){
-				sql += "date'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
+				sql += "'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
 			} else {
 				sql += StringUtils.fieldValue(fieldValue);
 			}
@@ -547,9 +547,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 				sql += field.getFieldName()+"=";
 
 				if(field.getFieldType()==Types.TIMESTAMP){
-					sql += "date'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
+					sql += "'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
 				}else if(field.getFieldType()==Types.DATE){
-					sql += "date'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
+					sql += "'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
 				} else {
 					sql += StringUtils.fieldValue(fieldValue);
 				}
@@ -610,9 +610,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 			Object fieldValue = field.getFieldValue();
 			
 			if(field.getFieldType()==Types.TIMESTAMP){
-				sql += "date'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
+				sql += "'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
 			}else if(field.getFieldType()==Types.DATE){
-				sql += "date'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
+				sql += "'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
 			} else {
 				sql += StringUtils.fieldValue(fieldValue);
 			}
@@ -649,9 +649,9 @@ public abstract class AbstractSQL implements ProcessSQL,Serializable{
 			Object fieldValue = field.getFieldValue();
 			
 			if(field.getFieldType()==Types.TIMESTAMP){
-				sql += "date'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
+				sql += "'"+CalendarUtils.dtformat(((Date)fieldValue))+"'";
 			}else if(field.getFieldType()==Types.DATE){
-				sql += "date'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
+				sql += "'"+CalendarUtils.dformat(((Date)fieldValue))+"'";
 			} else {
 				sql += StringUtils.fieldValue(fieldValue);
 			}
