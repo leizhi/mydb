@@ -127,6 +127,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1114,6 +1115,24 @@ public class DbConnectionDefaultPool extends DbConnectionProvider {
 		public Struct createStruct(String typeName, Object[] attributes)
 				throws SQLException {
 			return null;
+		}
+
+		public void abort(Executor arg0) throws SQLException {
+		}
+
+		public int getNetworkTimeout() throws SQLException {
+			return 0;
+		}
+
+		public String getSchema() throws SQLException {
+			return null;
+		}
+
+		public void setNetworkTimeout(Executor arg0, int arg1)
+				throws SQLException {
+		}
+
+		public void setSchema(String arg0) throws SQLException {
 		}
 
 	}
