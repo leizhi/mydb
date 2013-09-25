@@ -70,9 +70,9 @@ public class DbBridgingBean {
 			Object bindDate = new Date();
 			
 			if(value.length()==10){
-				bindDate =  CalendarUtils.dtparse(value);
-			}else if(value.length() > 10 && value.length() < 20){
 				bindDate =  CalendarUtils.dparse(value);
+			}else if(value.length() > 10 && value.length() < 20){
+				bindDate =  CalendarUtils.dtparse(value);
 			}			
 			setMethod.invoke(bean, new Object[] { bindDate });
 		}
