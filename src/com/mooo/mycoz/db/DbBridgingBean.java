@@ -10,9 +10,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.mooo.mycoz.common.CalendarUtils;
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
@@ -66,19 +66,14 @@ public class DbBridgingBean {
 			Object valueObj = valueOf.invoke(cl, new Object[] { value });
 			setMethod.invoke(bean, new Object[] { valueObj });
 		} else if(cl == java.util.Date.class || cl == java.sql.Date.class){
-			SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
-			SimpleDateFormat tformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-			
-			Object bindDate;
+
+			Object bindDate = new Date();
 			
 			if(value.length()==10){
-				bindDate =  dformat.parse(value);
-			}else if(value.length()==19){
-				bindDate =  tformat.parse(value);
-			}else{
-				bindDate = new Date();
-			}
-			
+				bindDate =  CalendarUtils.dtparse(value);
+			}else if(value.length() > 10 && value.length() < 20){
+				bindDate =  CalendarUtils.dparse(value);
+			}			
 			setMethod.invoke(bean, new Object[] { bindDate });
 		}
 	}
