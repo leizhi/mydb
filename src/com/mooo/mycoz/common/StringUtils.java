@@ -909,6 +909,8 @@ public class StringUtils {
 	}
 	
 	public static String getFunName(String objName) {
+		objName = objName.trim();
+		
 		String funName = objName.substring(0, 1).toUpperCase();
 
 		if (objName.length() > 1) {
