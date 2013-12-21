@@ -42,8 +42,6 @@ public class DbBridgingBean {
 		// 得到方法名
 		String funName = StringUtils.getFunName(propertyName);
 		// get方法
-		System.out.println(bean.getClass().getMethod("getCreditRate"));
-		
 		Method getMethod = bean.getClass().getMethod("get" + funName);
 		// 得到参数类型
 		Class<?> cl = getMethod.getReturnType();
