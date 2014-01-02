@@ -9,12 +9,17 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 import com.mooo.mycoz.db.sql.SQLFactory;
 import com.mooo.mycoz.db.sql.ProcessSQL;
 
 public class DBObject implements DbProcess{
+
+	private static Log log = LogFactory.getLog(DBObject.class);
 
 	/**
 	 * database operation method
@@ -37,7 +42,7 @@ public class DBObject implements DbProcess{
 		
 		String executeSQL = processSQL.addSQL(this);
 		
-		System.out.println("executeSQL:" + executeSQL);
+		if (log.isDebugEnabled()) log.debug("executeSQL:" + executeSQL);
 
 		try{
 			if(connection != null){
@@ -81,7 +86,7 @@ public class DBObject implements DbProcess{
 		
 		Statement stmt = null;
 		String executeSQL = processSQL.updateSQL(this);
-		System.out.println("executeSQL:" + executeSQL);
+		if (log.isDebugEnabled()) log.debug("executeSQL:" + executeSQL);
 		try{
 			if(connection != null){
 				myConn = connection;
@@ -125,7 +130,7 @@ public class DBObject implements DbProcess{
 		
 		Statement stmt = null;
 		String executeSQL = processSQL.deleteSQL(this);
-		System.out.println("executeSQL:" + executeSQL);
+		if (log.isDebugEnabled()) log.debug("executeSQL:" + executeSQL);
 		try{
 			if(connection != null){
 				myConn = connection;
@@ -170,7 +175,7 @@ public class DBObject implements DbProcess{
 		
 		Statement stmt = null;
 		String executeSQL = processSQL.countSQL(this);
-		System.out.println("countSQL:" + executeSQL);
+		if (log.isDebugEnabled()) log.debug("countSQL:" + executeSQL);
 		try {
 			if(connection != null){
 				myConn = connection;
@@ -224,7 +229,7 @@ public class DBObject implements DbProcess{
 		
 		Statement stmt = null;
 		String executeSQL = processSQL.searchSQL(this);
-		System.out.println("executeSQL:" + executeSQL);
+		if (log.isDebugEnabled()) log.debug("executeSQL:" + executeSQL);
 		
 		try {
 			retrieveList = new ArrayList<Object>();
@@ -323,7 +328,7 @@ public class DBObject implements DbProcess{
 		
 		executeSQL += " LIMIT 1";
 		
-		System.out.println("executeSQL:" + executeSQL);
+		if (log.isDebugEnabled()) log.debug("executeSQL:" + executeSQL);
 
 		try {
 			if(connection != null){

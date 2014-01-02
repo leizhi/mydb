@@ -12,12 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 import com.mooo.mycoz.db.sql.MysqlMultiSQL;
 
 public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 	
+	private static Log log = LogFactory.getLog(MultiDBObject.class);
+
 	/**
 	 * 
 	 */
@@ -26,7 +31,7 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 
 		List<Object> retrieveList = null;
 		String doSql = searchSQL();
-		System.out.println("searchSQL->" + doSql);
+		if (log.isDebugEnabled()) log.debug("searchSQL->" + doSql);
 
 		Connection myConn = null;
 		Statement stmt = null;
@@ -112,8 +117,8 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 		long minutes = (finishTime - startTime) / 1000 / 60 - hours * 60;
 		long seconds = (finishTime - startTime) / 1000 - hours * 60 * 60 - minutes * 60;
 		
-		System.out.println(finishTime - startTime);
-		System.out.println("search expends:   " + hours + ":" + minutes + ":" + seconds);
+		if (log.isDebugEnabled()) log.debug(finishTime - startTime);
+		if (log.isDebugEnabled()) log.debug("search expends:   " + hours + ":" + minutes + ":" + seconds);
 		return retrieveList;
 	}
 	
@@ -133,7 +138,7 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 
 		String doSql = buildCountSQL();
 		
-		System.out.println("countSQL->" + doSql);
+		if (log.isDebugEnabled()) log.debug("countSQL->" + doSql);
 
 		Connection myConn = null;
 		Statement stmt = null;
@@ -180,8 +185,8 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 		long minutes = (finishTime - startTime) / 1000 / 60 - hours * 60;
 		long seconds = (finishTime - startTime) / 1000 - hours * 60 * 60 - minutes * 60;
 		
-		System.out.println(finishTime - startTime);
-		System.out.println("count expends:   " + hours + ":" + minutes + ":" + seconds);
+		if (log.isDebugEnabled()) log.debug(finishTime - startTime);
+		if (log.isDebugEnabled()) log.debug("count expends:   " + hours + ":" + minutes + ":" + seconds);
 		return total;
 	}
 }

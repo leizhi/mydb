@@ -60,7 +60,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -948,7 +947,7 @@ public class StringUtils {
 	*/
 	public static void noNull(String str) throws NullPointerException{
 		if(str == null || str.equals("")){
-			throw new NullPointerException("cant no null");
+			throw new NullPointerException("input can't null");
 		}
 	}
 	public static boolean isNull(String str) {
