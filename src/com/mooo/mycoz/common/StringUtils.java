@@ -957,7 +957,7 @@ public class StringUtils {
 		return false;
 	}
 
-	public static String notEmpty(String str) throws NullPointerException{
+	public static String notEmpty(String str) {
 		if(str == null){
 			return "";
 		}else {
