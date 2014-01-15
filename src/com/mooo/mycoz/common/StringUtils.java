@@ -59,6 +59,7 @@ package com.mooo.mycoz.common;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -962,6 +963,30 @@ public class StringUtils {
 			return "";
 		}else {
 			return str;
+		}
+	}
+	
+	public static String notEmpty(Double sDouble) {
+		if(sDouble == null){
+			return "";
+		}else {
+			return sDouble.toString();
+		}
+	}
+	
+	public static String notEmpty(Integer sInt) {
+		if(sInt == null){
+			return "";
+		}else {
+			return sInt.toString();
+		}
+	}
+	
+	public static String notEmpty(Date sdate) {
+		if(sdate == null){
+			return "";
+		}else {
+			return CalendarUtils.dtformat(sdate);
 		}
 	}
 	
