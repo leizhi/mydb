@@ -260,9 +260,13 @@ public class StringUtils {
 	 * @return a hashed version of the passed-in String
 	 */
 	public synchronized static final String hash(String data) {
+		return hash("MD5",data);
+	}
+
+	public synchronized static final String hash(String algorithm,String data) {
 		if (digest == null) {
 			try {
-				digest = MessageDigest.getInstance("MD5");
+				digest = MessageDigest.getInstance(algorithm);
 			} catch (NoSuchAlgorithmException nsae) {
 				System.err.println("Failed to load the MD5 MessageDigest. "
 						+ "Jive will be unable to function normally.");
@@ -273,7 +277,7 @@ public class StringUtils {
 		digest.update(data.getBytes());
 		return toHex(digest.digest());
 	}
-
+	
 	/**
 	 * Turns an array of bytes into a String representing each byte as an
 	 * unsigned hex number.
