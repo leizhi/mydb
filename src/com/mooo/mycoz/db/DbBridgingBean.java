@@ -124,7 +124,7 @@ public class DbBridgingBean {
 				new Class[] { cl });
 
 		// 当参数为空时直接赋予NULL值
-		if (value == null || value==0) {
+		if (value == null) {
 			setMethod.invoke(bean, new Object[] { null });
 			return;
 		}
@@ -151,7 +151,7 @@ public class DbBridgingBean {
 				new Class[] { cl });
 
 		// 当参数为空时直接赋予NULL值
-		if (value == null || value==0) {
+		if (value == null) {
 			setMethod.invoke(bean, new Object[] { null });
 			return;
 		}
@@ -178,7 +178,7 @@ public class DbBridgingBean {
 				new Class[] { cl });
 
 		// 当参数为空时直接赋予NULL值
-		if (value == null || value==0) {
+		if (value == null) {
 			setMethod.invoke(bean, new Object[] { null });
 			return;
 		}
