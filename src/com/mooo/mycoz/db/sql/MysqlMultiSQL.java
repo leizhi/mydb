@@ -158,9 +158,9 @@ public class MysqlMultiSQL implements ProcessMultiSQL {
 
 				if(isHead) {
 					isHead = false;
-					sql += value;
+					sql += value+" "+value.replace('.', '_');
 				}else{
-					sql += ","+value;
+					sql += ","+value+" "+value.replace('.', '_');
 				}
 			}
 		}

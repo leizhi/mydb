@@ -54,6 +54,7 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 
 			String key;
 			String catalog,table,column;
+			String aliasT,columnLabel;
 			
 			while (result.next()) {
 				
@@ -72,23 +73,26 @@ public class MultiDBObject extends MysqlMultiSQL implements MultiDbProcess {
 					catalog = rsmd.getCatalogName(i);
 					table = rsmd.getTableName(i);
 					
-					column = rsmd.getColumnName(i);
+					columnLabel = rsmd.getColumnLabel(i);
+					
+					aliasT = columnLabel.substring(0,columnLabel.indexOf('_'));
+					column = columnLabel.substring(columnLabel.indexOf('_')+1);
 
 					int type = DbUtil.type(myConn,catalog,table,StringUtils.upperToPrefix(column,null));
 					
 					if (type==-100) continue;
 					
-					if(allRow.containsKey(StringUtils.toLowerFirst(table))){
-						Object bean = allRow.get(StringUtils.toLowerFirst(table));
+					if(allRow.containsKey(aliasT)){
+						Object bean = allRow.get(aliasT);
 						
 						boolean enableCase = new Boolean(DbConfig.getProperty("Db.case"));
 						
 						if(type == Types.TIMESTAMP){
-							DbBridgingBean.bindProperty(bean,StringUtils.prefixToUpper(rsmd.getColumnName(i),null,enableCase),result.getTimestamp(i));
+							DbBridgingBean.bindProperty(bean,StringUtils.prefixToUpper(column,null,enableCase),result.getTimestamp(i));
 						}else {
-							DbBridgingBean.bindProperty(bean,StringUtils.prefixToUpper(rsmd.getColumnName(i),null,enableCase),result.getString(i));	
+							DbBridgingBean.bindProperty(bean,StringUtils.prefixToUpper(column,null,enableCase),result.getString(i));	
 						}					
-					}
+					}					
 				}
 				retrieveList.add(allRow);
 			}
