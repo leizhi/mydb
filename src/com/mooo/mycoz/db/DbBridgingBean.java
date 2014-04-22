@@ -189,6 +189,33 @@ public class DbBridgingBean {
 		}
 	}
 	
+	public static void bindProperty(Object bean, String propertyName,
+			Float value) throws NoSuchMethodException,
+			InvocationTargetException, IllegalAccessException, ParseException,
+			InstantiationException {
+
+		// 得到方法名
+		String funName = StringUtils.getFunName(propertyName);
+		// get方法
+		Method getMethod = bean.getClass().getMethod("get" + funName);
+		// 得到参数类型
+		Class<?> cl = getMethod.getReturnType();
+		// set方法
+		Method setMethod = bean.getClass().getMethod("set" + funName,
+				new Class[] { cl });
+
+		// 当参数为空时直接赋予NULL值
+		if (value == null) {
+			setMethod.invoke(bean, new Object[] { null });
+			return;
+		}
+
+		// 根据不同的系统对象转换
+		if (cl == Float.class) {
+			setMethod.invoke(bean, new Object[] { value });
+		}
+	}
+	
 	public static void bindProperty(Object bean, String propertyName,Date date) throws NoSuchMethodException,
 			InvocationTargetException, IllegalAccessException, ParseException,
 			InstantiationException {

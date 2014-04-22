@@ -352,6 +352,22 @@ public class DBObject implements DbProcess{
 						DbBridgingBean.bindProperty(this,
 								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
 								result.getTimestamp(i));
+					}else if(type == Types.INTEGER || type == Types.SMALLINT){
+						DbBridgingBean.bindProperty(this,
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
+								result.getInt(i));
+					}else if(type == Types.BIGINT){
+						DbBridgingBean.bindProperty(this,
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
+								result.getLong(i));
+					}else if(type == Types.DOUBLE){
+						DbBridgingBean.bindProperty(this,
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
+								result.getDouble(i));
+					}else if(type == Types.FLOAT){
+						DbBridgingBean.bindProperty(this,
+								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
+								result.getFloat(i));
 					}else {
 						DbBridgingBean.bindProperty(this,
 								StringUtils.prefixToUpper(rsmd.getColumnName(i),null,true),
