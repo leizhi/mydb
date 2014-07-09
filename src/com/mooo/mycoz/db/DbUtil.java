@@ -116,7 +116,7 @@ public class DbUtil {
 
 			ResultSet result = myConn.getMetaData().getColumns(catalog, null, table,column);
 			
-			if(result.next()){
+			while(result.next()){
 				return result.getInt(5);
 			}
 			
