@@ -9,7 +9,7 @@
 
 <!-- configure mysql database -->
  
-<entry key="DbConnectionDefaultPool.driver">org.gjt.mm.mysql.Driver</entry>
+<entry key="DbConnectionDefaultPool.driver">org.mariadb.jdbc.Driver</entry>
 <entry key="DbConnectionDefaultPool.server">jdbc:mysql://192.168.1.100/wineBranch?useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;transformedBitIsBoolean=true</entry>
 <entry key="DbConnectionDefaultPool.username">mycoz</entry>
 <entry key="DbConnectionDefaultPool.password">xmlpj0#</entry>
