@@ -65,41 +65,50 @@ import java.util.Date;
  */
 public class CalendarUtils {
 
-	private static SimpleDateFormat dtformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
-	private static SimpleDateFormat dtformat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	public static final String YMDHMS = "yyyy-MM-dd HH:mm:ss";
 
-	private static SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
-	
-	private static SimpleDateFormat dformat2 = new SimpleDateFormat("yyMMdd");
+	public static final String YMDHM = "yyyy-MM-dd HH:mm";
+
+	public static final String YMD = "yyyy-MM-dd";
+
+	public static final String NYMD = "yyyyMMdd";
+
+	public static String dtformat(Date date,String sformat){
+		return new SimpleDateFormat(sformat).format(date);
+	}
+
+	public static Date dtparse(String dateValue,String sformat) throws ParseException{
+		return new SimpleDateFormat(sformat).parse(dateValue);
+	}
 
 	public static String dtformat(Date date){
-		return dtformat.format(date);
+		return dtformat(date,YMDHMS);
 	}
+
 	public static Date dtparse(String dateValue) throws ParseException{
-		return dtformat.parse(dateValue);
+		return dtparse(dateValue,YMDHMS);
 	}
 	
 	public static String dtformat2(Date date){
-		return dtformat2.format(date);
+		return dtformat(date,YMDHM);
 	}
 	public static Date dtparse2(String dateValue) throws ParseException{
-		return dtformat2.parse(dateValue);
+		return dtparse(dateValue,YMDHM);
 	}
 	
 	public static String dformat(Date date){
-		return dformat.format(date);
+		return dtformat(date,YMD);
 	}
 	
 	public static Date dparse(String dateValue) throws ParseException{
-		return dformat.parse(dateValue);
+		return dtparse(dateValue,YMD);
 	}
 	
 	public static String dformat2(Date date){
-		return dformat2.format(date);
+		return dtformat(date,NYMD);
 	}
 	
 	public static Date dparse2(String dateValue) throws ParseException{
-		return dformat2.parse(dateValue);
+		return dtparse(dateValue,NYMD);
 	}
 }
