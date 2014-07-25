@@ -59,6 +59,7 @@ package com.mooo.mycoz.common;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Calendar;
 
 /**
  * Utility class to peform common String manipulation algorithms.
@@ -68,6 +69,12 @@ public class CalendarUtils {
 	public static final String YMDHMS = "yyyy-MM-dd HH:mm:ss";
 
 	public static final String YMDHM = "yyyy-MM-dd HH:mm";
+
+	public static final String NYMDHM = "yyyyMMddHHmm";
+
+	public static final String YMDH = "yyyy-MM-dd HH";
+
+	public static final String NYMDH = "yyyyMMddHH";
 
 	public static final String YMD = "yyyy-MM-dd";
 
@@ -79,6 +86,26 @@ public class CalendarUtils {
 
 	public static Date dtparse(String dateValue,String sformat) throws ParseException{
 		return new SimpleDateFormat(sformat).parse(dateValue);
+	}
+
+	//日期偏移量
+	public static String dtoffset(String dtbegin,String dtformat,
+				int yoffset,int moffset,int doffset,int hoffset) {
+		try {
+			Calendar now = Calendar.getInstance();
+			now.setTime(dtparse(dtbegin,dtformat));
+
+			now.add(Calendar.YEAR, yoffset);
+			now.add(Calendar.MONTH, moffset);
+			now.add(Calendar.DAY_OF_MONTH, doffset);
+			now.add(Calendar.HOUR_OF_DAY, hoffset);
+
+			return dtformat(now.getTime(),dtformat);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	public static String dtformat(Date date){
